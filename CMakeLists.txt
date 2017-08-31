@@ -11,7 +11,6 @@ set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
 find_package(XACC REQUIRED)
 
-message (STATUS "FOUND XACC AT ${XACC_ROOT}")
 set(CppMicroServicesConfig_DIR "${XACC_ROOT}/share/cppmicroservices3/cmake")
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${XACC_ROOT}/share/xacc")
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CppMicroServicesConfig_DIR}")
@@ -25,8 +24,6 @@ include_directories(${Boost_INCLUDE_DIRS})
 include_directories(${XACC_ROOT}/include/rapidjson/include)
 include_directories(${XACC_ROOT}/include/eigen)
 include_directories(${CMAKE_SOURCE_DIR}/utils)
-
-set (LIBRARY_NAME xacc-rigetti)
 
 link_directories(${XACC_LIBRARY_DIR})
 
