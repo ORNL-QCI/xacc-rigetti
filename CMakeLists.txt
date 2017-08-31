@@ -5,6 +5,10 @@ set(CMAKE_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_STANDARD 14)
 message(STATUS "C++ version ${CXX_STANDARD} configured.")
 
+# Make sure all build libraries have reference to their dependents
+set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
+set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
+
 find_package(XACC REQUIRED)
 
 message (STATUS "FOUND XACC AT ${XACC_ROOT}")
@@ -24,7 +28,7 @@ include_directories(${CMAKE_SOURCE_DIR}/utils)
 
 set (LIBRARY_NAME xacc-rigetti)
 
-link_directories(${XACC_LIBRARY_DIRS})
+link_directories(${XACC_LIBRARY_DIR})
 
 add_subdirectory(compiler)
 add_subdirectory(accelerator)

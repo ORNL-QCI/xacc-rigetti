@@ -99,6 +99,7 @@ bool RigettiAccelerator::isValidBufferSize(const int NBits) {
 void RigettiAccelerator::execute(std::shared_ptr<AcceleratorBuffer> buffer,
 		const std::shared_ptr<xacc::Function> kernel) {
 
+
 	// Get the runtime options map, and initialize
 	// some basic variables we are going to need
 	auto options = RuntimeOptions::instance();
