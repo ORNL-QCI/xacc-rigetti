@@ -1,0 +1,37 @@
+cmake_minimum_required(VERSION 3.3 FATAL_ERROR)
+project(xacc-rigetti LANGUAGES CXX)
+
+set(CMAKE_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_STANDARD 14)
+message(STATUS "C++ version ${CXX_STANDARD} configured.")
+
+find_package(XACC REQUIRED)
+
+message (STATUS "FOUND XACC AT ${XACC_ROOT}")
+set(CppMicroServicesConfig_DIR "${XACC_ROOT}/share/cppmicroservices3/cmake")
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${XACC_ROOT}/share/xacc")
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CppMicroServicesConfig_DIR}")
+include(tests)
+include(CppMicroServicesConfig)
+
+find_package(Boost COMPONENTS system program_options filesystem chrono thread REQUIRED)
+
+include_directories(${XACC_INCLUDE_DIRS})
+include_directories(${Boost_INCLUDE_DIRS})
+include_directories(${XACC_ROOT}/include/rapidjson/include)
+include_directories(${XACC_ROOT}/include/eigen)
+include_directories(${CMAKE_SOURCE_DIR}/utils)
+
+set (LIBRARY_NAME xacc-rigetti)
+
+link_directories(${XACC_LIBRARY_DIRS})
+
+add_subdirectory(compiler)
+add_subdirectory(accelerator)
+add_subdirectory(examples)
+
+include_directories(${CMAKE_SOURCE_DIR}/compiler)
+# Gather tests
+file (GLOB test_files tests/Quil*.cpp)
+add_tests("${test_files}" "${CMAKE_CURRENT_SOURCE_DIR}" "${Boost_LIBRARIES};xacc-rigetti-quilcompiler")
+   
