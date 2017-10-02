@@ -96,6 +96,21 @@ bool RigettiAccelerator::isValidBufferSize(const int NBits) {
 	return NBits > 0 && NBits < 31;
 }
 
+std::vector<std::shared_ptr<AcceleratorBuffer>> RigettiAccelerator::execute(
+		std::shared_ptr<AcceleratorBuffer> buffer,
+		const std::vector<std::shared_ptr<Function>> functions) {
+	int counter = 0;
+	std::vector<std::shared_ptr<AcceleratorBuffer>> tmpBuffers;
+	for (auto f : functions) {
+		auto tmpBuffer = std::make_shared<AcceleratorBuffer>(buffer->name()+std::to_string(counter), buffer->size());
+		execute(tmpBuffer, f);
+		tmpBuffers.push_back(tmpBuffer);
+		counter++;
+	}
+
+	return tmpBuffers;
+}
+
 void RigettiAccelerator::execute(std::shared_ptr<AcceleratorBuffer> buffer,
 		const std::shared_ptr<xacc::Function> kernel) {
 
