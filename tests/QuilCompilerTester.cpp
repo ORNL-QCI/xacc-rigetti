@@ -256,6 +256,7 @@ RY(theta1) 0
 	auto ir = compiler->compile(src);
 	std::cout << "TEST:\n" << ir->getKernels()[0]->toString("qreg") << "\n\n";
 
+	BOOST_VERIFY(ir->getKernels()[0]->nParameters() == 1);
 
 }
 

@@ -82,7 +82,7 @@ std::shared_ptr<IR> QuilCompiler::compile(const std::string& src) {
 std::shared_ptr<Function> QuilCompiler::compileKernel(const std::string& src) {
 
 	// First off, split the string into lines
-	std::vector<std::string> lines, fLineSpaces;
+	std::vector<std::string> lines, fLineSpaces, fLineCommas;
 
 	boost::split(lines, src, boost::is_any_of("\n"));
 	auto functionLine = lines[0];
@@ -91,7 +91,28 @@ std::shared_ptr<Function> QuilCompiler::compileKernel(const std::string& src) {
 	boost::trim(fName);
 	fName = fName.substr(0, fName.find_first_of("("));
 
-	auto f = std::make_shared<GateFunction>(fName);
+	std::cout << "FUNCTIONLINE: " << functionLine << "\n";
+	boost::split(fLineCommas, functionLine, boost::is_any_of(","));
+	std::vector<InstructionParameter> params;
+	for (int i = 1; i < fLineCommas.size(); i++) {
+		boost::trim(fLineCommas[i]);
+		auto arg = fLineCommas[i];
+		std::vector<std::string> splitSpace;
+		if (boost::contains(arg, ")")) {
+			arg = arg.substr(0, arg.find_first_of(")"));
+		}
+
+		boost::split(splitSpace, arg, boost::is_any_of(" "));
+
+		arg = splitSpace[1];
+
+		std::cout << "ARG: " << arg << "\n";
+		InstructionParameter p(arg);
+		params.push_back(p);
+	}
+
+
+	auto f = std::make_shared<GateFunction>(fName, params);
 
 	auto firstCodeLine = lines.begin() + 1;
 	auto lastCodeLine = lines.end() - 1;
