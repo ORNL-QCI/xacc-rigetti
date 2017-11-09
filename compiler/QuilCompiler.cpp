@@ -63,7 +63,6 @@ std::shared_ptr<IR> QuilCompiler::compile(const std::string& src) {
 		}
 
 		if (boost::contains(line, "}")) {
-			std::cout << "Found End Function, Creating Kernel with ";
 			beginFunction = false;
 			functionStr += line;
 			auto f = compileKernel(functionStr);
@@ -91,7 +90,6 @@ std::shared_ptr<Function> QuilCompiler::compileKernel(const std::string& src) {
 	boost::trim(fName);
 	fName = fName.substr(0, fName.find_first_of("("));
 
-	std::cout << "FUNCTIONLINE: " << functionLine << "\n";
 	boost::split(fLineCommas, functionLine, boost::is_any_of(","));
 	std::vector<InstructionParameter> params;
 	for (int i = 1; i < fLineCommas.size(); i++) {
