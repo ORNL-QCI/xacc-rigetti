@@ -104,7 +104,6 @@ std::shared_ptr<Function> QuilCompiler::compileKernel(const std::string& src) {
 
 		arg = splitSpace[1];
 
-		std::cout << "ARG: " << arg << "\n";
 		InstructionParameter p(arg);
 		params.push_back(p);
 	}
