@@ -245,4 +245,17 @@ MEASURE 0 [0]
 
 }
 
+BOOST_AUTO_TEST_CASE(checkVariableParameter) {
+
+	const std::string src = R"src(__qpu__ statePrep2x2(qbit qreg, double theta1) {
+RY(theta1) 0
+})src";
+
+	auto compiler = std::make_shared<QuilCompiler>();
+
+	auto ir = compiler->compile(src);
+	std::cout << "TEST:\n" << ir->getKernels()[0]->toString("qreg") << "\n\n";
+
+
+}
 

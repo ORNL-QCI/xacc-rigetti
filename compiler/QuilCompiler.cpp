@@ -103,6 +103,13 @@ std::shared_ptr<Function> QuilCompiler::compileKernel(const std::string& src) {
 	std::string currentLabel, currentConditionalGate;
 	std::shared_ptr<ConditionalFunction> currentConditional;
 
+	auto is_double = [](const std::string& s) -> bool
+	{
+	    std::istringstream iss(s);
+	    double d;
+	    return iss >> d >> std::ws && iss.eof();
+	};
+
 	for (auto quilLine : quil) {
 		boost::trim(quilLine);
 
@@ -125,8 +132,13 @@ std::shared_ptr<Function> QuilCompiler::compileKernel(const std::string& src) {
 				std::vector<std::string> paramsStrs;
 				boost::split(paramsStrs, paramStr, boost::is_any_of(","));
 				for (auto s : paramsStrs) {
-					InstructionParameter p(std::stod(s));
-					params.push_back(p);
+					if (is_double(s)) {
+						InstructionParameter p(std::stod(s));
+						params.push_back(p);
+					} else {
+						InstructionParameter p(s);
+						params.push_back(p);
+					}
 				}
 			}
 
