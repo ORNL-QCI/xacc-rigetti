@@ -220,4 +220,29 @@ BOOST_AUTO_TEST_CASE(checkTranslateIR) {
 
 }
 
+BOOST_AUTO_TEST_CASE(checkMultipleKernels) {
+
+	const std::string src = R"src(__qpu__ term0(AcceleratorBuffer qreg) {
+}
+__qpu__ term1(AcceleratorBuffer qreg) {
+H 0
+MEASURE 0 [0]
+}
+__qpu__ term2(AcceleratorBuffer qreg) {
+MEASURE 0 [0]
+})src";
+
+	auto compiler = std::make_shared<QuilCompiler>();
+
+	auto ir = compiler->compile(src);
+
+	BOOST_VERIFY(ir->getKernels().size() == 3);
+
+	std::cout << "TEST:\n" << ir->getKernels()[0]->toString("qreg") << "\n\n";
+	std::cout << "TEST:\n" << ir->getKernels()[1]->toString("qreg") << "\n\n";
+	std::cout << "TEST:\n" << ir->getKernels()[2]->toString("qreg") << "\n\n";
+
+
+}
+
 

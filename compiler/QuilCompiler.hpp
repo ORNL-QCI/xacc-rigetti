@@ -95,6 +95,10 @@ public:
 	 */
 	virtual ~QuilCompiler() {}
 
+protected:
+
+	std::shared_ptr<Function> compileKernel(const std::string& src);
+
 };
 
 }

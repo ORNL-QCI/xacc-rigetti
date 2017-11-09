@@ -49,9 +49,37 @@ std::shared_ptr<IR> QuilCompiler::compile(const std::string& src,
 std::shared_ptr<IR> QuilCompiler::compile(const std::string& src) {
 
 	// Need to analyze string for function calls
-	// FIXME for now just assume one function
-
 	auto ir = std::make_shared<GateQIR>();
+
+	std::vector<std::string> splitAllLines;
+	boost::split(splitAllLines, src, boost::is_any_of("\n"));
+
+	bool beginFunction = false;
+
+	std::string functionStr = "";
+	for (auto line : splitAllLines) {
+		if (boost::contains(line, "__qpu__")) {
+			beginFunction = true;
+		}
+
+		if (boost::contains(line, "}")) {
+			std::cout << "Found End Function, Creating Kernel with ";
+			beginFunction = false;
+			functionStr += line;
+			auto f = compileKernel(functionStr);
+			ir->addKernel(f);
+			functionStr.clear();
+		}
+
+		if (beginFunction) {
+			functionStr += line +"\n";
+		}
+	}
+
+	return ir;
+}
+
+std::shared_ptr<Function> QuilCompiler::compileKernel(const std::string& src) {
 
 	// First off, split the string into lines
 	std::vector<std::string> lines, fLineSpaces;
@@ -177,9 +205,7 @@ std::shared_ptr<IR> QuilCompiler::compile(const std::string& src) {
 		}
 	}
 
-	ir->addKernel(f);
-
-	return ir;
+	return f;
 }
 
 const std::string QuilCompiler::translate(const std::string& bufferVariable,
