@@ -31,54 +31,54 @@
 #include "XACC.hpp"
 
 const std::string src(""
-	"__qpu__ initializeState(qbit qreg, float theta) {\n"
-	"   Rx(qreg[0], 3.1415926);\n"
-	"   Ry(qreg[1], 1.57079);\n"
-	"   Rx(qreg[0], 7.8539752);\n"
-	"   CNOT(qreg[1], qreg[0]);\n"
-	"   Rz(qreg[0], theta);\n"
-	"   CNOT(qreg[1], qreg[0]);\n"
-	"   Ry(qreg[1], 7.8539752);\n"
-	"   Rx(qreg[0], 1.57079);\n"
-	"}\n"
-	""
-	"__qpu__ g1Term (qbit qreg, float theta) {\n"
-	"   initializeState(qreg, theta);\n"
-	"   cbit creg[1];\n"
-	"   creg[0] = MeasZ(qreg[0]);\n"
-	"}\n"
-	""
-	"__qpu__ g2Term (qbit qreg, float theta) {\n"
-	"   initializeState(qreg, theta);\n"
-	"   cbit creg[1];\n"
-	"   creg[0] = MeasZ(qreg[1]);\n"
-	"}\n"
-	"__qpu__ g3Term (qbit qreg, float theta) {\n"
-	"   initializeState(qreg, theta);\n"
-	"   cbit creg[2];\n"
-	"   creg[1] = MeasZ(qreg[1]);\n"
-	"   creg[0] = MeasZ(qreg[0]);\n"
-	"}\n"
-	"__qpu__ g4Term(qbit qreg, float theta) {\n"
-	"   initializeState(qreg, theta);\n"
-	"   cbit creg[2];\n"
-	"   Rx(qreg[1], 1.57079);\n"
-	"   Rx(qreg[0], 1.57079);\n"
-	"   creg[1] = MeasZ(qreg[1]);\n"
-	"   creg[0] = MeasZ(qreg[0]);\n"
-	"}\n"
-	""
-	"__qpu__ g5Term(qbit qreg, float theta) {\n"
-	"   initializeState(qreg, theta);\n"
-	"   cbit creg[2];\n"
-	"   H(qreg[1]);\n"
-	"   creg[1] = MeasZ(qreg[1]);\n"
-	"   H(qreg[0]);\n"
-	"   creg[0] = MeasZ(qreg[0]);\n"
-	"}\n"
-	"");
+		"__qpu__ initializeState(qbit qreg, float theta) {\n"
+		"   Rx(qreg[0], 3.1415926);\n"
+		"   Ry(qreg[1], 1.57079);\n"
+		"   Rx(qreg[0], 7.8539752);\n"
+		"   CNOT(qreg[1], qreg[0]);\n"
+		"   Rz(qreg[0], theta);\n"
+		"   CNOT(qreg[1], qreg[0]);\n"
+		"   Ry(qreg[1], 7.8539752);\n"
+		"   Rx(qreg[0], 1.57079);\n"
+		"}\n"
+		""
+		"__qpu__ g1Term (qbit qreg, float theta) {\n"
+		"   initializeState(qreg, theta);\n"
+		"   cbit creg[1];\n"
+		"   creg[0] = MeasZ(qreg[0]);\n"
+		"}\n"
+		""
+		"__qpu__ g2Term (qbit qreg, float theta) {\n"
+		"   initializeState(qreg, theta);\n"
+		"   cbit creg[1];\n"
+		"   creg[0] = MeasZ(qreg[1]);\n"
+		"}\n"
+		"__qpu__ g3Term (qbit qreg, float theta) {\n"
+		"   initializeState(qreg, theta);\n"
+		"   cbit creg[2];\n"
+		"   creg[1] = MeasZ(qreg[1]);\n"
+		"   creg[0] = MeasZ(qreg[0]);\n"
+		"}\n"
+		"__qpu__ g4Term(qbit qreg, float theta) {\n"
+		"   initializeState(qreg, theta);\n"
+		"   cbit creg[2];\n"
+		"   Rx(qreg[1], 1.57079);\n"
+		"   Rx(qreg[0], 1.57079);\n"
+		"   creg[1] = MeasZ(qreg[1]);\n"
+		"   creg[0] = MeasZ(qreg[0]);\n"
+		"}\n"
+		""
+		"__qpu__ g5Term(qbit qreg, float theta) {\n"
+		"   initializeState(qreg, theta);\n"
+		"   cbit creg[2];\n"
+		"   H(qreg[1]);\n"
+		"   creg[1] = MeasZ(qreg[1]);\n"
+		"   H(qreg[0]);\n"
+		"   creg[0] = MeasZ(qreg[0]);\n"
+		"}\n"
+		"");
 
-int main (int argc, char** argv) {
+int main(int argc, char** argv) {
 
 	// Initialize the XACC Framework
 	xacc::Initialize(argc, argv);
@@ -90,49 +90,35 @@ int main (int argc, char** argv) {
 	// Allocate a register of 3 qubits
 	auto qubitReg = qpu->createBuffer("qreg", 2);
 
-	// Create a Program
-	xacc::Program program(qpu, src);
-
-	// Request the quantum kernel representing
-	// the above source code
-	auto g1Term = program.getKernel<float>("g1Term");
-	auto g2Term = program.getKernel<float>("g2Term");
-	auto g3Term = program.getKernel<float>("g3Term");
-	auto g4Term = program.getKernel<float>("g4Term");
-	auto g5Term = program.getKernel<float>("g5Term");
-
+    auto pi = 3.14159265359;
 	std::ofstream file("out.csv");
 	file << "Angle, Z0, Z1, Z0Z1, Y0Y1, X0X1\n";
-	auto pi = 3.14159265359;
-	double g0 = 1.0, g1 = 1.0, g2 = 1.0, g3 = 1.0, g4 = 1.0, g5 = 1.0;
+	// Create a Program
+	xacc::Program program(qpu, src);
+	program.build();
+	// Request the quantum kernel representing
+	// the above source code
+	auto kernels = program.getKernels<float>();
 	for (float theta = -pi; theta <= pi; theta += .2) {
 
-		g1Term(qubitReg, theta);
-		auto e1 = qubitReg->getExpectationValueZ();
-		qubitReg->resetBuffer();
+		file << theta;
 
-		// G2 Term, same as g1 so just use it
-		g2Term(qubitReg, theta);
-		auto e2 = qubitReg->getExpectationValueZ();
-		qubitReg->resetBuffer();
-
-		// G3 Term, same as g1 so just use it
-		g3Term(qubitReg, theta);
-		auto e3 = qubitReg->getExpectationValueZ();
-		qubitReg->resetBuffer();
-
-		g4Term(qubitReg, theta);
-		auto e4 = qubitReg->getExpectationValueZ();
-		qubitReg->resetBuffer();
-
-		g5Term(qubitReg, theta);
-		auto e5 = qubitReg->getExpectationValueZ();
-		qubitReg->resetBuffer();
-
-		file << theta << ", " << e1 << ", " << e2 << ", " << e3 << ", " << e4 << ", " << e5 << "\n";
-
+		// Skip the first kernel, it is the state prep
+		// kernel that all others will call anyway
+		for (int i = 1; i < kernels.size(); i++) {
+			file << ", ";
+			std::cout << "Executing Kernel " << i << "\n";
+			kernels[i](qubitReg, theta);
+			std::cout << "Done Executing Kernel " << i << "\n";
+			auto e = qubitReg->getExpectationValueZ();
+			std::cout << "EXP VAL IS " << e << "\n";
+			qubitReg->resetBuffer();
+			file << e;
+		}
+		file << "\n";
+		file.flush();
 	}
-	
+
 	file.close();
 
 	// Finalize the XACC Framework
@@ -140,6 +126,4 @@ int main (int argc, char** argv) {
 
 	return 0;
 }
-
-
 

@@ -31,12 +31,18 @@
 #ifndef QUANTUM_GATE_ACCELERATORS_RIGETTIACCELERATOR_HPP_
 #define QUANTUM_GATE_ACCELERATORS_RIGETTIACCELERATOR_HPP_
 
-#include "Accelerator.hpp"
+#include "RemoteAccelerator.hpp"
 #include "InstructionIterator.hpp"
 #include "QuilVisitor.hpp"
-#include "RuntimeOptions.hpp"
+#include "XACC.hpp"
 #include <boost/algorithm/string.hpp>
 #include <boost/filesystem.hpp>
+
+#define RAPIDJSON_HAS_STDSTRING 1
+
+#include "rapidjson/prettywriter.h"
+#include "rapidjson/document.h"
+using namespace rapidjson;
 
 using namespace xacc;
 
@@ -51,9 +57,12 @@ namespace quantum {
  * through Fire's HTTP Client utilities.
  *
  */
-class RigettiAccelerator : virtual public Accelerator {
+class RigettiAccelerator : virtual public RemoteAccelerator {
 public:
 
+	RigettiAccelerator() : RemoteAccelerator() {}
+
+	RigettiAccelerator(std::shared_ptr<RestClient> client) : RemoteAccelerator(client) {}
 	/**
 	 * Create, store, and return an AcceleratorBuffer with the given
 	 * variable id string and of the given number of bits.
@@ -70,9 +79,8 @@ public:
 	virtual std::shared_ptr<AcceleratorBuffer> createBuffer(
 				const std::string& varId);
 
-	virtual void initialize() {
+	virtual void initialize() {}
 
-	}
 	/**
 	 * Return true if this Accelerator can allocated
 	 * NBits number of bits.
@@ -81,29 +89,16 @@ public:
 	 */
 	virtual bool isValidBufferSize(const int NBits);
 
-	/**
-	 * Execute the kernel on the provided AcceleratorBuffer through a
-	 * HTTP Post of Quil instructions to the Rigetti QPU at api.rigetti.com/qvm
-	 *
-	 * @param ir
-	 */
-	virtual void execute(std::shared_ptr<AcceleratorBuffer> buffer,
-			const std::shared_ptr<xacc::Function> kernel);
-
-	/**
-	 * Execute a set of kernels with one remote call. Return
-	 * a list of AcceleratorBuffers that provide a new view
-	 * of the given one AcceleratorBuffer. The ith AcceleratorBuffer
-	 * contains the results of the ith kernel execution.
-	 *
-	 * @param buffer The AcceleratorBuffer to execute on
-	 * @param functions The list of IR Functions to execute
-	 * @return tempBuffers The list of new AcceleratorBuffers
-	 */
-	virtual std::vector<std::shared_ptr<AcceleratorBuffer>> execute(
+	virtual const std::string processInput(
 			std::shared_ptr<AcceleratorBuffer> buffer,
-			const std::vector<std::shared_ptr<Function>> functions);
+			std::vector<std::shared_ptr<Function>> functions);
 
+	/**
+	 * take response and create
+	 */
+	virtual std::vector<std::shared_ptr<AcceleratorBuffer>> processResponse(
+			std::shared_ptr<AcceleratorBuffer> buffer,
+			const std::string& response);
 	/**
 	 * This Accelerator models QPU Gate accelerators.
 	 * @return
@@ -131,15 +126,11 @@ public:
 		auto desc = std::make_shared<options_description>(
 				"Rigetti Accelerator Options");
 		desc->add_options()("rigetti-api-key", value<std::string>(),
-				"Provide the Rigetti Forest API key. This is used if $HOME/.pyquil_config is not found")("rigetti-type",
-				value<std::string>(),
-				"Provide the execution type: multishot, wavefunction, "
-				"multishot-measure, ping, or version.")
-				("rigetti-trials", value<std::string>(), "Provide the number of trials to execute.");
+				"Provide the Rigetti Forest API key. This is used if $HOME/.pyquil_config is not found")
+				("rigetti-trials", value<std::string>(), "Provide the number of trials to execute.")
+				("rigetti-backend", value<std::string>(), "Optional input, if provided will trigger "
+						"QPU connection with given device name. Otherwise, if not give, default to QVM.");
 		return desc;
-	}
-
-	RigettiAccelerator() {
 	}
 
 	virtual const std::string name() const {
@@ -148,7 +139,7 @@ public:
 
 	virtual const std::string description() const {
 		return "The Rigetti Accelerator interacts with "
-				"the Forest QVM to execute quantum IR.";
+				"the Forest QVM or QPU to execute XACC quantum IR.";
 	}
 
 	/**

@@ -61,10 +61,16 @@ protected:
 
 	std::map<int, int> qubitToClassicalBitIndex;
 
+	std::vector<int> measuredQubits;
+
+	bool includeMeasures = true;
 
 	int numAddresses = 0;
 
 public:
+
+	QuilVisitor() {}
+	QuilVisitor(bool measures) : includeMeasures(measures) {}
 
 	/**
 	 * Visit hadamard gates
@@ -104,11 +110,17 @@ public:
 	 * Visit Measurement gates
 	 */
 	void visit(Measure& m) {
-		int classicalBitIdx = m.getClassicalBitIndex();
-		quilStr += "MEASURE " + std::to_string(m.bits()[0]) + " [" + std::to_string(classicalBitIdx) + "]\n";
-		classicalAddresses += std::to_string(classicalBitIdx) + ", ";
-		numAddresses++;
-		qubitToClassicalBitIndex.insert(std::make_pair(m.bits()[0], classicalBitIdx));
+		if (includeMeasures) {
+			int classicalBitIdx = m.getClassicalBitIndex();
+			quilStr += "MEASURE " + std::to_string(m.bits()[0]) + " ["
+					+ std::to_string(classicalBitIdx) + "]\n";
+			classicalAddresses += std::to_string(classicalBitIdx) + ", ";
+			numAddresses++;
+			qubitToClassicalBitIndex.insert(
+					std::make_pair(m.bits()[0], classicalBitIdx));
+		} else {
+			measuredQubits.push_back(m.bits()[0]);
+		}
 	}
 
 	/**
@@ -179,6 +191,11 @@ public:
 	int getNumberOfAddresses() {
 		return numAddresses;
 	}
+
+	std::vector<int> getMeasuredQubits() {
+		return measuredQubits;
+	}
+
 	/**
 	 * The destructor
 	 */
