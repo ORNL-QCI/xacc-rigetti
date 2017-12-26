@@ -79,6 +79,9 @@ public:
 		quilStr += "H " + std::to_string(h.bits()[0]) + "\n";
 	}
 
+	void visit(Identity& i) {
+		quilStr += "I " + std::to_string(i.bits()[0]) + "\n";
+	}
 	/**
 	 * Visit CNOT gates
 	 */
