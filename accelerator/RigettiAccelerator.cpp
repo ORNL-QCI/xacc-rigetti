@@ -79,9 +79,12 @@ const std::string RigettiAccelerator::processInput(
 	// to map our IR to Quil.
 	auto visitor = std::make_shared<QuilVisitor>(false);
 
-	headers.insert(std::make_pair("Content-type", "application/json"));
+	headers.insert(std::make_pair("Content-type", "application/json; charset=utf-8"));
 	headers.insert(std::make_pair("X-Api-Key", apiKey));
 	headers.insert(std::make_pair("X-User-Id", userId));
+	headers.insert({"Connection", "keep-alive"});
+	headers.insert({"Accept-Encoding", "gzip, deflate"});
+	headers.insert({"Accept", "application/octet-stream"});
 
 	remoteUrl = "https://job.rigetti.com";
 	postPath = "/beta/job";
@@ -117,19 +120,19 @@ const std::string RigettiAccelerator::processInput(
 
 	// Create the Json String
 	jsonStr += "{ \"type\" : \"" + type + "\", \"qubits\" : "
-			+ measuredQubitsString + ", \"quil-instructions\" : \""
+			+ measuredQubitsString + ", \"trials\" : " + trials + ", \"quil-instructions\" : \""
 			+ quilStr
-			+ "\", \"trials\" : " + trials
-			+ " }";
+			+ "\"}";
 
 	if (backend != "QVM") {
 		jsonStr = "{\"machine\": \"QPU\", \"program\": " + jsonStr
-				+ "}, \"device\": \"" + backend + "\"}";
+				+ ", \"device\": \"" + backend + "\"}";
 	} else {
 		jsonStr = "{\"machine\": \""+backend+"\", \"program\": " + jsonStr
 						+ "}";
 	}
 
+//	std::cout <<"JSON:\n" << jsonStr << "\n";
 	return jsonStr;
 }
 
@@ -137,6 +140,7 @@ std::vector<std::shared_ptr<AcceleratorBuffer>> RigettiAccelerator::processRespo
                 std::shared_ptr<AcceleratorBuffer> buffer,
                 const std::string& response) {
 	Document document;
+//	std::cout << "HELLO WORLD RESPONSE:\n" << response << "\n";
 	document.Parse(response);
 
 	auto jobId = std::string(document["jobId"].GetString());
