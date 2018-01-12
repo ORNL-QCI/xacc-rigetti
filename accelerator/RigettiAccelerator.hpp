@@ -79,6 +79,23 @@ public:
 	virtual std::shared_ptr<AcceleratorBuffer> createBuffer(
 				const std::string& varId);
 
+	virtual std::vector<std::shared_ptr<AcceleratorBuffer>> execute(
+			std::shared_ptr<AcceleratorBuffer> buffer,
+			const std::vector<std::shared_ptr<Function>> functions) {
+		int counter = 0;
+		std::vector<std::shared_ptr<AcceleratorBuffer>> tmpBuffers;
+		for (auto f : functions) {
+			XACCInfo("Rigetti Executing kernel = " + f->getName());
+			auto tmpBuffer = createBuffer(
+					buffer->name() + std::to_string(counter), buffer->size());
+			RemoteAccelerator::execute(tmpBuffer, f);
+			tmpBuffers.push_back(tmpBuffer);
+			counter++;
+		}
+
+		return tmpBuffers;
+	}
+
 	virtual void initialize() {}
 
 	/**
