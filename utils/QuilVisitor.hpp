@@ -82,6 +82,11 @@ public:
 	void visit(Identity& i) {
 		quilStr += "I " + std::to_string(i.bits()[0]) + "\n";
 	}
+
+	void visit(CZ& cz) {
+		quilStr += "CZ " + std::to_string(cz.bits()[0]) + " " + std::to_string(cz.bits()[1]) + "\n";
+	}
+
 	/**
 	 * Visit CNOT gates
 	 */
