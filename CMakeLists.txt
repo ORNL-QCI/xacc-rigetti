@@ -34,5 +34,5 @@ add_subdirectory(examples)
 include_directories(${CMAKE_SOURCE_DIR}/compiler)
 # Gather tests
 file (GLOB test_files tests/Quil*.cpp)
-add_tests("${test_files}" "${CMAKE_CURRENT_SOURCE_DIR}" "${Boost_LIBRARIES};xacc-rigetti-quilcompiler")
+add_tests("${test_files}" "${CMAKE_CURRENT_SOURCE_DIR}" "${Boost_LIBRARIES};xacc;xacc-rigetti-quilcompiler")
    
