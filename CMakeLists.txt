@@ -21,8 +21,6 @@ find_package(Boost COMPONENTS system program_options filesystem chrono thread RE
 
 include_directories(${XACC_INCLUDE_DIRS})
 include_directories(${Boost_INCLUDE_DIRS})
-include_directories(${XACC_ROOT}/include/rapidjson/include)
-include_directories(${XACC_ROOT}/include/eigen)
 include_directories(${CMAKE_SOURCE_DIR}/utils)
 
 link_directories(${XACC_LIBRARY_DIR})
@@ -34,5 +32,5 @@ add_subdirectory(examples)
 include_directories(${CMAKE_SOURCE_DIR}/compiler)
 # Gather tests
 file (GLOB test_files tests/Quil*.cpp)
-add_tests("${test_files}" "${CMAKE_CURRENT_SOURCE_DIR}" "${Boost_LIBRARIES};xacc;xacc-rigetti-quilcompiler")
+add_tests("${test_files}" "${CMAKE_CURRENT_SOURCE_DIR}" "${Boost_LIBRARIES};${XACC_LIBRARIES};xacc-rigetti-quilcompiler")
    
