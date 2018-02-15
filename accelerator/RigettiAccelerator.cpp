@@ -82,9 +82,9 @@ const std::string RigettiAccelerator::processInput(
 	headers.insert(std::make_pair("Content-type", "application/json; charset=utf-8"));
 	headers.insert(std::make_pair("X-Api-Key", apiKey));
 	headers.insert(std::make_pair("X-User-Id", userId));
-	headers.insert({"Connection", "keep-alive"});
-	headers.insert({"Accept-Encoding", "gzip, deflate"});
-	headers.insert({"Accept", "application/octet-stream"});
+	headers.insert(std::make_pair("Connection", "keep-alive"));
+	headers.insert(std::make_pair("Accept-Encoding", "gzip, deflate"));
+	headers.insert(std::make_pair("Accept", "application/octet-stream"));
 
 	remoteUrl = "https://job.rigetti.com";
 	postPath = "/beta/job";
@@ -98,7 +98,7 @@ const std::string RigettiAccelerator::processInput(
 	}
 
 	if (functions.size() > 1)
-		XACCError("RigettiAccelerator can only launch one job at a time.");
+		xacc::error("RigettiAccelerator can only launch one job at a time.");
 
 
 	InstructionIterator it(functions[0]);
@@ -208,7 +208,7 @@ void RigettiAccelerator::searchAPIKey(std::string& key, std::string& userid) {
 
 		// Ensure that the user has provided an api-key
 		if (!options->exists("rigetti-api-key")) {
-			XACCError("Cannot execute kernel on Rigetti chip without API Key.");
+			xacc::error("Cannot execute kernel on Rigetti chip without API Key.");
 		}
 
 		// Set the API Key
@@ -221,7 +221,7 @@ void RigettiAccelerator::searchAPIKey(std::string& key, std::string& userid) {
 
 	// If its still empty, then we have a problem
 	if (key.empty()) {
-		XACCError("Error. The API Key is empty. Please place it "
+		xacc::error("Error. The API Key is empty. Please place it "
 				"in your $HOME/.pyquil_config file, $PYQUIL_CONFIG env var, "
 				"or provide --api-key argument.");
 	}

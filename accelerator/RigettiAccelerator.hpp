@@ -85,7 +85,7 @@ public:
 		int counter = 0;
 		std::vector<std::shared_ptr<AcceleratorBuffer>> tmpBuffers;
 		for (auto f : functions) {
-			XACCInfo("Rigetti Executing kernel = " + f->getName());
+			xacc::info("Rigetti Executing kernel = " + f->getName());
 			auto tmpBuffer = createBuffer(
 					buffer->name() + std::to_string(counter), buffer->size());
 			RemoteAccelerator::execute(tmpBuffer, f);
