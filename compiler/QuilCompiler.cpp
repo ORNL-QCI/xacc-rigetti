@@ -32,6 +32,7 @@
 #include "QuilCompiler.hpp"
 #include "QuilVisitor.hpp"
 #include <boost/tokenizer.hpp>
+#include "XACC.hpp"
 
 namespace xacc {
 
@@ -123,9 +124,12 @@ std::shared_ptr<Function> QuilCompiler::compileKernel(const std::string& src) {
 
 	auto is_double = [](const std::string& s) -> bool
 	{
-	    std::istringstream iss(s);
-	    double d;
-	    return iss >> d >> std::ws && iss.eof();
+	    try {
+		std::stod(s);
+	    } catch(std::exception& e) {
+		return false;
+	    }
+	    return true;
 	};
 
 	for (auto quilLine : quil) {
