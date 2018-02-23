@@ -99,6 +99,7 @@ protected:
 
 	std::shared_ptr<Function> compileKernel(const std::string& src);
 
+	std::map<std::string, std::shared_ptr<Function>> previousFunctions;
 };
 
 }

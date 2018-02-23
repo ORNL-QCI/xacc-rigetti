@@ -67,6 +67,7 @@ std::shared_ptr<IR> QuilCompiler::compile(const std::string& src) {
 			beginFunction = false;
 			functionStr += line;
 			auto f = compileKernel(functionStr);
+			previousFunctions.insert({f->getName(), f});
 			ir->addKernel(f);
 			functionStr.clear();
 		}
@@ -143,7 +144,6 @@ std::shared_ptr<Function> QuilCompiler::compileKernel(const std::string& src) {
 
 			auto gateName = splitSpaces[0];
 			boost::trim(gateName);
-
 			if (boost::contains(gateName, "(")) {
 				// This is a parameterized gate
 				auto i1 = gateName.find_first_of("(");
@@ -211,7 +211,11 @@ std::shared_ptr<Function> QuilCompiler::compileKernel(const std::string& src) {
 					}
 				}
 				continue;
+			} else if (previousFunctions.count(gateName)) {
+				f->addInstruction(previousFunctions[gateName]);
+				continue;
 			} else {
+
 
 				for (int i = 1; i < splitSpaces.size(); i++) {
 					qubits.push_back(std::stoi(splitSpaces[i]));
