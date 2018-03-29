@@ -34,7 +34,6 @@
 
 #include <boost/test/included/unit_test.hpp>
 #include "QuilCompiler.hpp"
-#include "GateQIR.hpp"
 #include "QuilVisitor.hpp"
 #include "CountGatesOfTypeVisitor.hpp"
 
@@ -43,6 +42,8 @@ using namespace xacc;
 using namespace xacc::quantum;
 
 BOOST_AUTO_TEST_CASE(checkTeleportQuil) {
+
+	xacc::Initialize();
 
 	const std::string src("__qpu__ teleport (qbit qreg[3]) {\n"
 			"   # Prepare a bell state\n"
@@ -64,12 +65,11 @@ BOOST_AUTO_TEST_CASE(checkTeleportQuil) {
 
 	auto compiler = std::make_shared<QuilCompiler>();
 	auto ir = compiler->compile(src);
-	auto qir = std::dynamic_pointer_cast<GateQIR>(ir);
 
-	auto function = qir->getKernel("teleport");
+	auto function = ir->getKernel("teleport");
 	std::cout << "HELLO\n" << function->toString("qreg") << "\n";
 
-	BOOST_VERIFY(qir->numberOfKernels() == 1);
+	BOOST_VERIFY(ir->getKernels().size() == 1);
 
 	BOOST_VERIFY(function->nInstructions() == 9);
 
@@ -112,14 +112,13 @@ MEASURE 2 [2]
 	auto compiler = std::make_shared<QuilCompiler>();
 
 	auto ir = compiler->compile(src);
-	auto qir = std::dynamic_pointer_cast<GateQIR>(ir);
 
-	auto function = qir->getKernel("teleport");
+	auto function = ir->getKernel("teleport");
 
 	std::cout << "HELLO\n" << function->toString("qreg") << "\n";
 	std::cout << "N: " << function->nInstructions() << "\n";
 
-	BOOST_VERIFY(qir->numberOfKernels() == 1);
+	BOOST_VERIFY(ir->getKernels().size() == 1);
 
 	BOOST_VERIFY(function->nInstructions() == 10);
 
@@ -144,13 +143,12 @@ BOOST_AUTO_TEST_CASE(checkRotations) {
 	auto compiler = std::make_shared<QuilCompiler>();
 
 	auto ir = compiler->compile(src);
-	auto qir = std::dynamic_pointer_cast<GateQIR>(ir);
 
-	auto function = qir->getKernel("rotate");
+	auto function = ir->getKernel("rotate");
 
 	std::cout << "HELLO\n" << function->toString("qreg") << "\n";
 
-	BOOST_VERIFY(qir->numberOfKernels() == 1);
+	BOOST_VERIFY(ir->getKernels().size() == 1);
 
 	BOOST_VERIFY(function->nInstructions() == 1);
 
@@ -257,6 +255,20 @@ RY(theta1) 0
 	std::cout << "TEST:\n" << ir->getKernels()[0]->toString("qreg") << "\n\n";
 
 	BOOST_VERIFY(ir->getKernels()[0]->nParameters() == 1);
+
+	const std::string src2 = R"src(__qpu__ statePrep2x2(qbit qreg, double theta1) {
+RY(theta1) 0
+})src";
+
+	ir = compiler->compile(src2);
+	std::cout << "TEST:\n" << ir->getKernels()[0]->toString("qreg") << "\n\n";
+
+	BOOST_VERIFY(ir->getKernels()[0]->nParameters() == 1);
+	Eigen::VectorXd v(1);
+	v(0) = 2.2;
+	auto evaled = ir->getKernels()[0]->operator()(v);//({2.2});
+	std::cout << "TEST:\n" << evaled->toString("qreg") << "\n\n";
+
 
 }
 

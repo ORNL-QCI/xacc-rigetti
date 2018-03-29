@@ -28,7 +28,6 @@
  *   Initial API and implementation - Alex McCaskey
  *
  **********************************************************************************/
-#include "GateQIR.hpp"
 #include "QuilCompiler.hpp"
 #include "QuilVisitor.hpp"
 #include <boost/tokenizer.hpp>
@@ -50,7 +49,7 @@ std::shared_ptr<IR> QuilCompiler::compile(const std::string& src,
 std::shared_ptr<IR> QuilCompiler::compile(const std::string& src) {
 
 	// Need to analyze string for function calls
-	auto ir = std::make_shared<GateQIR>();
+	auto ir = xacc::getService<IRProvider>("gate")->createIR();
 
 	std::vector<std::string> splitAllLines;
 	boost::split(splitAllLines, src, boost::is_any_of("\n"));
@@ -67,7 +66,7 @@ std::shared_ptr<IR> QuilCompiler::compile(const std::string& src) {
 			beginFunction = false;
 			functionStr += line;
 			auto f = compileKernel(functionStr);
-			previousFunctions.insert({f->getName(), f});
+			previousFunctions.insert({f->name(), f});
 			ir->addKernel(f);
 			functionStr.clear();
 		}
@@ -84,6 +83,7 @@ std::shared_ptr<Function> QuilCompiler::compileKernel(const std::string& src) {
 
 	// First off, split the string into lines
 	std::vector<std::string> lines, fLineSpaces, fLineCommas;
+	auto gateRegistry = xacc::getService<IRProvider>("gate");
 
 	boost::split(lines, src, boost::is_any_of("\n"));
 	auto functionLine = lines[0];
@@ -111,14 +111,13 @@ std::shared_ptr<Function> QuilCompiler::compileKernel(const std::string& src) {
 	}
 
 
-	auto f = std::make_shared<GateFunction>(fName, params);
+	auto f = gateRegistry->createFunction(fName, {}, params);
 
 	auto firstCodeLine = lines.begin() + 1;
 	auto lastCodeLine = lines.end() - 1;
 	std::vector<std::string> quil(firstCodeLine, lastCodeLine);
 	bool isConditional = false;
 	std::shared_ptr<xacc::Instruction> instruction;
-	auto gateRegistry = xacc::quantum::GateInstructionRegistry::instance();
 	std::vector<std::shared_ptr<xacc::Instruction>> measurements;
 	std::string currentLabel, currentConditionalGate;
 	std::shared_ptr<ConditionalFunction> currentConditional;
@@ -158,8 +157,16 @@ std::shared_ptr<Function> QuilCompiler::compileKernel(const std::string& src) {
 						InstructionParameter p(std::stod(s));
 						params.push_back(p);
 					} else {
-						InstructionParameter p(s);
-						params.push_back(p);
+
+						if (boost::contains(s,"+")) {
+
+						} else if(boost::contains(s,"-")) {
+
+						} else {
+
+							InstructionParameter p(s);
+							params.push_back(p);
+						}
 					}
 				}
 			}
@@ -173,9 +180,9 @@ std::shared_ptr<Function> QuilCompiler::compileKernel(const std::string& src) {
 				boost::replace_all(splitSpaces[2], "[", "");
 				boost::replace_all(splitSpaces[2], "]", "");
 				int classicalBit = std::stoi(splitSpaces[2]);
-				instruction = gateRegistry->create("Measure", qubits);
-				xacc::InstructionParameter p(classicalBit);
-				instruction->setParameter(0,p);
+				instruction = gateRegistry->createInstruction("Measure", qubits, {InstructionParameter(classicalBit)});
+//				xacc::InstructionParameter p(classicalBit);
+//				instruction->setParameter(0,p);
 				measurements.push_back(instruction);
 			} else if (gateName == "JUMP-UNLESS" || gateName == "JUMP-WHEN") {
 				currentConditionalGate = gateName;
@@ -225,7 +232,7 @@ std::shared_ptr<Function> QuilCompiler::compileKernel(const std::string& src) {
 				if (gateName == "RY") gateName = "Ry";
 				if (gateName == "RZ") gateName = "Rz";
 
-				instruction = gateRegistry->create(gateName, qubits);
+				instruction = gateRegistry->createInstruction(gateName, qubits);
 
 				if (!params.empty()) {
 					for (int i = 0; i < params.size(); i++) {

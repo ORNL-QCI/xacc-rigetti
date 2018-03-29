@@ -39,7 +39,7 @@ usFunctionEmbedResources(TARGET ${LIBRARY_NAME}
 
 target_link_libraries(${LIBRARY_NAME} ${Boost_LIBRARIES} ${XACC_LIBRARIES})
 
-install(TARGETS ${LIBRARY_NAME} DESTINATION ${XACC_ROOT}/lib/plugins/accelerators)
+install(TARGETS ${LIBRARY_NAME} DESTINATION $ENV{HOME}/.xacc/plugins/accelerators)
    
 file (GLOB test_files ../tests/RigettiAcceleratorTester.cpp)
 add_tests("${test_files}" "${CMAKE_CURRENT_SOURCE_DIR}" "${Boost_LIBRARIES};${XACC_LIBRARIES};xacc-rigetti-accelerator")

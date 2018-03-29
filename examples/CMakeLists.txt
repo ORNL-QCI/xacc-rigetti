@@ -10,7 +10,3 @@ target_link_libraries(h2_exp_vals_scaffold_rigetti ${Boost_LIBRARIES} ${XACC_LIB
 add_executable(h2_exp_vals_multi_exec h2_exp_vals_multi_exec.cpp)
 target_link_libraries(h2_exp_vals_multi_exec ${Boost_LIBRARIES} ${XACC_LIBRARIES} dl)
 
-install(TARGETS teleport_scaffold_rigetti DESTINATION ${XACC_ROOT}/examples)
-install(TARGETS qft_scaffold_rigetti DESTINATION ${XACC_ROOT}/examples)
-install(TARGETS h2_exp_vals_scaffold_rigetti DESTINATION ${XACC_ROOT}/examples)
-   

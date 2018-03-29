@@ -9,6 +9,9 @@ message(STATUS "C++ version ${CXX_STANDARD} configured.")
 set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
 set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
+if (NOT XACC_DIR)
+   set(XACC_DIR "$ENV{HOME}/.xacc")
+endif()
 find_package(XACC REQUIRED)
 
 set(CppMicroServicesConfig_DIR "${XACC_ROOT}/share/cppmicroservices3/cmake")

@@ -35,58 +35,20 @@
 #include <boost/test/included/unit_test.hpp>
 #include "RigettiAccelerator.hpp"
 #include "JsonVisitor.hpp"
+#include "IRProvider.hpp"
 
 using namespace xacc::quantum;
-BOOST_AUTO_TEST_CASE(checkKernelExecution) {
-
-	/*auto options = RuntimeOptions::instance();
-	options->insert(std::make_pair("rigetti-api-key", "fakekey"));
-	options->insert(std::make_pair("rigetti-type", "faketype"));
-
-	auto client = std::make_shared<FakeHttpClient>();
-	RigettiAccelerator acc(client);
-
-	auto qreg1 = acc.createBuffer("qreg", 3);
-	auto f = std::make_shared<GateFunction>("foo");
-
-	auto x = std::make_shared<X>(0);
-	auto h = std::make_shared<Hadamard>(1);
-	auto cn1 = std::make_shared<CNOT>(1, 2);
-	auto cn2 = std::make_shared<CNOT>(0, 1);
-	auto h2 = std::make_shared<Hadamard>(0);
-	auto m0 = std::make_shared<Measure>(0, 0);
-	auto m1 = std::make_shared<Measure>(1,1);
-
-	auto cond1 = std::make_shared<ConditionalFunction>(0);
-	auto z = std::make_shared<Z>(2);
-	cond1->addInstruction(z);
-	auto cond2 = std::make_shared<ConditionalFunction>(1);
-	auto x2 = std::make_shared<X>(2);
-	cond2->addInstruction(x2);
-
-	f->addInstruction(x);
-	f->addInstruction(h);
-	f->addInstruction(cn1);
-	f->addInstruction(cn2);
-	f->addInstruction(h2);
-	f->addInstruction(m0);
-	f->addInstruction(m1);
-	f->addInstruction(cond1);
-	f->addInstruction(cond2);
-
-	acc.execute(qreg1, f);
-
-	BOOST_VERIFY(client->postOccured);*/
-}
 
 BOOST_AUTO_TEST_CASE(buildQFT) {
 
+	xacc::Initialize();
+	auto gateRegistry = xacc::getService<IRProvider>("gate");
 	auto bitReversal =
-			[](std::vector<int> qubits) -> std::vector<std::shared_ptr<Instruction>> {
+			[&](std::vector<int> qubits) -> std::vector<std::shared_ptr<Instruction>> {
 				std::vector<std::shared_ptr<Instruction>> swaps;
 				auto endStart = qubits.size() - 1;
 				for (auto i = 0; i < std::floor(qubits.size() / 2.0); ++i) {
-					swaps.push_back(GateInstructionRegistry::instance()->create("Swap", std::vector<int> {qubits[i], qubits[endStart]}));
+					swaps.push_back(gateRegistry->createInstruction("Swap", std::vector<int> {qubits[i], qubits[endStart]}));
 					endStart--;
 				}
 
@@ -105,7 +67,7 @@ BOOST_AUTO_TEST_CASE(buildQFT) {
 				// just return a hadamard, if not,
 				// then we need to build up some cphase gates
 				if (qubits.size() == 1) {
-					auto hadamard = GateInstructionRegistry::instance()->create("H", std::vector<int> {q});
+					auto hadamard = gateRegistry->createInstruction("H", std::vector<int> {q});
 					return std::vector<std::shared_ptr<Instruction>>{hadamard};
 				} else {
 
@@ -116,13 +78,13 @@ BOOST_AUTO_TEST_CASE(buildQFT) {
 					auto n = 1 + qs.size();
 
 					// Build up a list of cphase gates
-					std::vector<std::shared_ptr<GateInstruction>> cphaseGates;
+					std::vector<std::shared_ptr<Instruction>> cphaseGates;
 					int idx = 0;
 					for (int i = n-1; i > 0; --i) {
 						auto q_idx = qs[idx];
 						auto angle = 3.1415926 / std::pow(2, n - i);
 						InstructionParameter p(angle);
-						auto cp = GateInstructionRegistry::instance()->create("CPhase", std::vector<int> {q, q_idx});
+						auto cp = gateRegistry->createInstruction("CPhase", std::vector<int> {q, q_idx});
 						cp->setParameter(0, p);
 						cphaseGates.push_back(cp);
 						idx++;
@@ -140,7 +102,7 @@ BOOST_AUTO_TEST_CASE(buildQFT) {
 					}
 
 					// add a final hadamard...
-					insts.push_back(GateInstructionRegistry::instance()->create("H", std::vector<int> {q}));
+					insts.push_back(gateRegistry->createInstruction("H", std::vector<int> {q}));
 
 					// and return
 					return insts;
@@ -155,7 +117,7 @@ BOOST_AUTO_TEST_CASE(buildQFT) {
 		qftInstructions.push_back(s);
 	}
 
-	auto qftKernel = std::make_shared<GateFunction>("foo");
+	auto qftKernel = gateRegistry->createFunction("foo", {}, {});
 	for (auto i : qftInstructions) {
 		qftKernel->addInstruction(i);
 	}
@@ -217,7 +179,7 @@ BOOST_AUTO_TEST_CASE(buildQFT) {
 		qft5Instructions.push_back(s);
 	}
 
-	auto qft5Kernel = std::make_shared<GateFunction>("foo");
+	auto qft5Kernel = gateRegistry->createFunction("foo", {}, {});
 	for (auto i : qft5Instructions) {
 		qft5Kernel->addInstruction(i);
 	}
@@ -242,6 +204,7 @@ BOOST_AUTO_TEST_CASE(buildQFT) {
 	}
 
 	std::cout << quilV5->getQuilString() << "\n" << expectedQuil << "\n";
+	xacc::Finalize();
 }
 
 

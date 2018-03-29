@@ -137,12 +137,12 @@ public:
 	void visit(ConditionalFunction& c) {
 		auto visitor = std::make_shared<QuilVisitor>();
 		auto classicalBitIdx = qubitToClassicalBitIndex[c.getConditionalQubit()];
-		quilStr += "JUMP-UNLESS @" + c.getName() + " [" + std::to_string(classicalBitIdx) + "]\n";
+		quilStr += "JUMP-UNLESS @" + c.name() + " [" + std::to_string(classicalBitIdx) + "]\n";
 		for (auto inst : c.getInstructions()) {
 			inst->accept(visitor);
 		}
 		quilStr += visitor->getQuilString();
-		quilStr += "LABEL @" + c.getName() + "\n";
+		quilStr += "LABEL @" + c.name() + "\n";
 	}
 
 	void visit(Rx& rx) {
