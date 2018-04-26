@@ -62,7 +62,7 @@ public:
 
 	RigettiAccelerator() : RemoteAccelerator() {}
 
-	RigettiAccelerator(std::shared_ptr<RestClient> client) : RemoteAccelerator(client) {}
+	RigettiAccelerator(std::shared_ptr<Client> client) : RemoteAccelerator(client) {}
 	/**
 	 * Create, store, and return an AcceleratorBuffer with the given
 	 * variable id string and of the given number of bits.
