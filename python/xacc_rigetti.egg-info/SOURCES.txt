@@ -1,6 +1,0 @@
-setup.py
-python/xacc_rigetti.egg-info/PKG-INFO
-python/xacc_rigetti.egg-info/SOURCES.txt
-python/xacc_rigetti.egg-info/dependency_links.txt
-python/xacc_rigetti.egg-info/not-zip-safe
-python/xacc_rigetti.egg-info/top_level.txt
