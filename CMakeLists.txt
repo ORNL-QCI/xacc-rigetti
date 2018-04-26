@@ -7,6 +7,10 @@ message(STATUS "C++ version ${CXX_STANDARD} configured.")
 
 find_package(XACC REQUIRED)
 
+if (CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
+    set (CMAKE_INSTALL_PREFIX "${XACC_ROOT}" CACHE PATH "default install path" FORCE )
+endif()
+
 set(CppMicroServicesConfig_DIR "${XACC_ROOT}/share/cppmicroservices3/cmake")
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${XACC_ROOT}/share/xacc")
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CppMicroServicesConfig_DIR}")
@@ -23,6 +27,9 @@ link_directories(${XACC_LIBRARY_DIR})
 
 add_subdirectory(compiler)
 add_subdirectory(accelerator)
+if(PYTHON_INCLUDE_DIR)
+add_subdirectory(python)
+endif()
 add_subdirectory(examples)
 
 include_directories(${CMAKE_SOURCE_DIR}/compiler)

@@ -1,0 +1,10 @@
+Metadata-Version: 1.0
+Name: xacc-rigetti
+Version: 0.1.0
+Summary: XACC plugins for interacting with Rigetti QPU/QVM
+Home-page: UNKNOWN
+Author: Alex McCaskey
+Author-email: xacc-dev@eclipse.org
+License: UNKNOWN
+Description: XACC provides a language and hardware agnostic programming framework for hybrid classical-quantum applications.
+Platform: UNKNOWN

@@ -77,6 +77,5 @@ else()
    set_target_properties(${LIBRARY_NAME} PROPERTIES LINK_FLAGS "-shared")
 endif()
 
-
-install(TARGETS ${LIBRARY_NAME} DESTINATION ${XACC_ROOT}/plugins) #$ENV{HOME}/.xacc/plugins/compilers)
+install(TARGETS ${LIBRARY_NAME} DESTINATION ${CMAKE_INSTALL_PREFIX}/plugins) 
 
