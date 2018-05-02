@@ -15,14 +15,12 @@ add_library(pyxaccrigetti SHARED xacc-rigetti-py.cpp)
 
 set_target_properties(pyxaccrigetti PROPERTIES PREFIX "")
 
-#target_link_libraries(pyxacc ${CppUsLib} xacc xacc-quantum-gate ${Boost_LIBRARIES} cpr curl) #xacc xacc-quantum-gate xacc-quantum-aqc CppMicroServices ${Boost_LIBRARIES} restclient-cpp) #cpprest ${OPENSSL_LIBRARIES})
-
-#if(APPLE)
-#   set_target_properties(pyxacc PROPERTIES INSTALL_RPATH "@loader_path/lib")
-#   set_target_properties(pyxacc PROPERTIES LINK_FLAGS "-undefined dynamic_lookup")
-#else()
-#   set_target_properties(pyxacc PROPERTIES INSTALL_RPATH "$ORIGIN/lib")
-#   set_target_properties(pyxacc PROPERTIES LINK_FLAGS "-shared")
-#endif()
+if(APPLE)
+   set_target_properties(pyxaccrigetti PROPERTIES INSTALL_RPATH "@loader_path/lib")
+   set_target_properties(pyxaccrigetti PROPERTIES LINK_FLAGS "-undefined dynamic_lookup")
+else()
+   set_target_properties(pyxaccrigetti PROPERTIES INSTALL_RPATH "$ORIGIN/lib")
+   set_target_properties(pyxaccrigetti PROPERTIES LINK_FLAGS "-shared")
+endif()
 
 install(TARGETS pyxaccrigetti DESTINATION ${CMAKE_INSTALL_PREFIX})
