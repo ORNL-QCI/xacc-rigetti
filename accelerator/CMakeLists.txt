@@ -50,4 +50,4 @@ endif()
 install(TARGETS ${LIBRARY_NAME} DESTINATION ${CMAKE_INSTALL_PREFIX}/plugins) 
    
 file (GLOB test_files ../tests/RigettiAcceleratorTester.cpp)
-add_tests("${test_files}" "${CMAKE_CURRENT_SOURCE_DIR}" "${XACC_LIBRARIES};xacc-rigetti-accelerator")
+#add_tests("${test_files}" "${CMAKE_CURRENT_SOURCE_DIR}" "${XACC_LIBRARIES};xacc-rigetti-accelerator")

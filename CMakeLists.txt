@@ -30,10 +30,10 @@ add_subdirectory(accelerator)
 if(PYTHON_INCLUDE_DIR)
 add_subdirectory(python)
 endif()
-add_subdirectory(examples)
+#add_subdirectory(examples)
 
 include_directories(${CMAKE_SOURCE_DIR}/compiler)
 # Gather tests
 file (GLOB test_files tests/Quil*.cpp)
-add_tests("${test_files}" "${CMAKE_CURRENT_SOURCE_DIR}" "${XACC_LIBRARIES};xacc-rigetti-quilcompiler")
+#add_tests("${test_files}" "${CMAKE_CURRENT_SOURCE_DIR}" "${XACC_LIBRARIES};xacc-rigetti-quilcompiler")
    
