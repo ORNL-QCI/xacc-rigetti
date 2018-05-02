@@ -4,8 +4,6 @@ mkdir -p $HOME/xacc-rigetti-wheelhouse
 eval "$(pyenv init -)"
 eval "$(pyenv virtualenv-init -)"
 
-export prefix="build\/lib."
-jcmaxwell:pyenv aqw$ echo "$h" | sed -e "s/^$prefix//" -e "s/$suffix$//"
 for version in 3.6.4 #2.7.14-ucs2 2.7.14-ucs4 3.3.7 3.4.7 3.5.4 3.6.4
 do
 	pyenv virtualenv $version xacc-$version
