@@ -28,18 +28,15 @@
  *   Initial API and implementation - Alex McCaskey
  *
  **********************************************************************************/
-#define BOOST_TEST_DYN_LINK
-#define BOOST_TEST_MODULE RigettiAcceleratorTester
-
 #include <memory>
-#include <boost/test/included/unit_test.hpp>
+#include <gtest/gtest.h>
 #include "RigettiAccelerator.hpp"
 #include "JsonVisitor.hpp"
 #include "IRProvider.hpp"
 
 using namespace xacc::quantum;
 
-BOOST_AUTO_TEST_CASE(buildQFT) {
+TEST(RigettiAcceleratorTester,buildQFT) {
 
 	xacc::Initialize();
 	auto gateRegistry = xacc::getService<IRProvider>("gate");
@@ -150,7 +147,7 @@ BOOST_AUTO_TEST_CASE(buildQFT) {
 	}
 	std::cout << quilV->getQuilString() << "\n" << expectedQuil << "\n";
 
-	BOOST_VERIFY(quilV->getQuilString() == expectedQuil);
+	EXPECT_TRUE(quilV->getQuilString() == expectedQuil);
 
 	expectedQuil =
 			"H 4\n"
@@ -208,3 +205,7 @@ BOOST_AUTO_TEST_CASE(buildQFT) {
 }
 
 
+int main(int argc, char** argv) {
+   ::testing::InitGoogleTest(&argc, argv);
+   return RUN_ALL_TESTS();
+}

@@ -28,18 +28,15 @@
  *   Initial API and implementation - Alex McCaskey
  *
  **********************************************************************************/
-#define BOOST_TEST_DYN_LINK
-#define BOOST_TEST_MODULE QuilVisitorTester
-
 #include <memory>
-#include <boost/test/included/unit_test.hpp>
+#include <gtest/gtest.h>
 #include "QuilVisitor.hpp"
 #include "InstructionIterator.hpp"
 
 using namespace xacc;
 using namespace xacc::quantum;
 
-BOOST_AUTO_TEST_CASE(checkIRToQuil) {
+TEST(QuilVisitorTester,checkIRToQuil) {
 
 	auto f = std::make_shared<GateFunction>("foo");
 
@@ -99,6 +96,10 @@ BOOST_AUTO_TEST_CASE(checkIRToQuil) {
 			"X 2\n"
 			"LABEL @conditional_1\n";
 
-	BOOST_VERIFY(expectedQuil == visitor->getQuilString());
+	EXPECT_TRUE(expectedQuil == visitor->getQuilString());
 }
 
+int main(int argc, char** argv) {
+   ::testing::InitGoogleTest(&argc, argv);
+   return RUN_ALL_TESTS();
+}

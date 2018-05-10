@@ -23,10 +23,10 @@ set_target_properties(${LIBRARY_NAME} PROPERTIES
   )
 
 if(BUILD_SHARED_LIBS)
-  set_target_properties(${LIBRARY_NAME} PROPERTIES
-    CXX_VISIBILITY_PRESET hidden
-    VISIBILITY_INLINES_HIDDEN 1
-    )
+	#  set_target_properties(${LIBRARY_NAME} PROPERTIES
+	#    CXX_VISIBILITY_PRESET hidden
+	#    VISIBILITY_INLINES_HIDDEN 1
+	#)
 endif()
 
 # Embed meta-data from a manifest.json file

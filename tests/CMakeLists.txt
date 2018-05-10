@@ -1,0 +1,4 @@
+add_xacc_test(RigettiAccelerator)
+add_xacc_test(QuilCompiler)
+target_link_libraries(QuilCompilerTester xacc-rigetti-quilcompiler)
+add_xacc_test(QuilVisitor)

@@ -1,4 +1,3 @@
-
 /***********************************************************************************
  * Copyright (c) 2016, UT-Battelle
  * All rights reserved.
@@ -29,10 +28,7 @@
  *   Initial API and implementation - Alex McCaskey
  *
  **********************************************************************************/
-#define BOOST_TEST_DYN_LINK
-#define BOOST_TEST_MODULE QuilCompilerTester
-
-#include <boost/test/included/unit_test.hpp>
+#include <gtest/gtest.h>
 #include "QuilCompiler.hpp"
 #include "QuilVisitor.hpp"
 #include "CountGatesOfTypeVisitor.hpp"
@@ -41,7 +37,7 @@ using namespace xacc;
 
 using namespace xacc::quantum;
 
-BOOST_AUTO_TEST_CASE(checkTeleportQuil) {
+TEST(QuilCompilerTester,checkTeleportQuil) {
 
 	xacc::Initialize();
 
@@ -69,9 +65,9 @@ BOOST_AUTO_TEST_CASE(checkTeleportQuil) {
 	auto function = ir->getKernel("teleport");
 	std::cout << "HELLO\n" << function->toString("qreg") << "\n";
 
-	BOOST_VERIFY(ir->getKernels().size() == 1);
+	EXPECT_TRUE(ir->getKernels().size() == 1);
 
-	BOOST_VERIFY(function->nInstructions() == 9);
+	EXPECT_TRUE(function->nInstructions() == 9);
 
 	auto hadamardVisitor = std::make_shared<CountGatesOfTypeVisitor<Hadamard>>(function);
 	auto cnotVisitor = std::make_shared<CountGatesOfTypeVisitor<CNOT>>(function);
@@ -79,15 +75,15 @@ BOOST_AUTO_TEST_CASE(checkTeleportQuil) {
 	auto conditionalVisitor = std::make_shared<CountGatesOfTypeVisitor<ConditionalFunction>>(function);
 	auto xVisitor = std::make_shared<CountGatesOfTypeVisitor<X>>(function);
 
-	BOOST_VERIFY(hadamardVisitor->countGates() == 2);
-	BOOST_VERIFY(cnotVisitor->countGates() == 2);
-	BOOST_VERIFY(measureVisitor->countGates() == 2);
-	BOOST_VERIFY(conditionalVisitor->countGates() == 2);
-	BOOST_VERIFY(xVisitor->countGates() == 1);
+	EXPECT_TRUE(hadamardVisitor->countGates() == 2);
+	EXPECT_TRUE(cnotVisitor->countGates() == 2);
+	EXPECT_TRUE(measureVisitor->countGates() == 2);
+	EXPECT_TRUE(conditionalVisitor->countGates() == 2);
+	EXPECT_TRUE(xVisitor->countGates() == 1);
 
 }
 
-BOOST_AUTO_TEST_CASE(checkIFELSE) {
+TEST(QuilCompilerTester,checkIFELSE) {
 	const std::string src =
 			R"src(__qpu__ teleport(qbit qreg[3]) {
 X 0
@@ -118,9 +114,9 @@ MEASURE 2 [2]
 	std::cout << "HELLO\n" << function->toString("qreg") << "\n";
 	std::cout << "N: " << function->nInstructions() << "\n";
 
-	BOOST_VERIFY(ir->getKernels().size() == 1);
+	EXPECT_TRUE(ir->getKernels().size() == 1);
 
-	BOOST_VERIFY(function->nInstructions() == 10);
+	EXPECT_TRUE(function->nInstructions() == 10);
 
 	auto hadamardVisitor = std::make_shared<CountGatesOfTypeVisitor<Hadamard>>(function);
 	auto cnotVisitor = std::make_shared<CountGatesOfTypeVisitor<CNOT>>(function);
@@ -128,14 +124,14 @@ MEASURE 2 [2]
 	auto conditionalVisitor = std::make_shared<CountGatesOfTypeVisitor<ConditionalFunction>>(function);
 	auto xVisitor = std::make_shared<CountGatesOfTypeVisitor<X>>(function);
 
-	BOOST_VERIFY(hadamardVisitor->countGates() == 2);
-	BOOST_VERIFY(cnotVisitor->countGates() == 2);
-	BOOST_VERIFY(measureVisitor->countGates() == 3);
-	BOOST_VERIFY(conditionalVisitor->countGates() == 2);
-	BOOST_VERIFY(xVisitor->countGates() == 1);
+	EXPECT_TRUE(hadamardVisitor->countGates() == 2);
+	EXPECT_TRUE(cnotVisitor->countGates() == 2);
+	EXPECT_TRUE(measureVisitor->countGates() == 3);
+	EXPECT_TRUE(conditionalVisitor->countGates() == 2);
+	EXPECT_TRUE(xVisitor->countGates() == 1);
 }
 
-BOOST_AUTO_TEST_CASE(checkRotations) {
+TEST(QuilCompilerTester,checkRotations) {
 	const std::string src =
 			R"src(__qpu__ rotate(qbit qreg[3]) {
 	RX(3.141592653589793) 0
@@ -148,17 +144,17 @@ BOOST_AUTO_TEST_CASE(checkRotations) {
 
 	std::cout << "HELLO\n" << function->toString("qreg") << "\n";
 
-	BOOST_VERIFY(ir->getKernels().size() == 1);
+	EXPECT_TRUE(ir->getKernels().size() == 1);
 
-	BOOST_VERIFY(function->nInstructions() == 1);
+	EXPECT_TRUE(function->nInstructions() == 1);
 
 	auto rxVisitor = std::make_shared<CountGatesOfTypeVisitor<Rx>>(function);
 
-	BOOST_VERIFY(rxVisitor->countGates() == 1);
+	EXPECT_TRUE(rxVisitor->countGates() == 1);
 }
 
 
-BOOST_AUTO_TEST_CASE(checkTranslateIR) {
+TEST(QuilCompilerTester,checkTranslateIR) {
 	auto compiler = std::make_shared<QuilCompiler>();
 
 	auto f = std::make_shared<GateFunction>("foo");
@@ -214,11 +210,11 @@ BOOST_AUTO_TEST_CASE(checkTranslateIR) {
 			"X 2\n"
 			"LABEL @conditional_1\n");
 
-	BOOST_VERIFY(expected == src);
+	EXPECT_TRUE(expected == src);
 
 }
 
-BOOST_AUTO_TEST_CASE(checkMultipleKernels) {
+TEST(QuilCompilerTester,checkMultipleKernels) {
 
 	const std::string src = R"src(__qpu__ term0(AcceleratorBuffer qreg) {
 }
@@ -234,7 +230,7 @@ MEASURE 0 [0]
 
 	auto ir = compiler->compile(src);
 
-	BOOST_VERIFY(ir->getKernels().size() == 3);
+	EXPECT_TRUE(ir->getKernels().size() == 3);
 
 	std::cout << "TEST:\n" << ir->getKernels()[0]->toString("qreg") << "\n\n";
 	std::cout << "TEST:\n" << ir->getKernels()[1]->toString("qreg") << "\n\n";
@@ -243,7 +239,7 @@ MEASURE 0 [0]
 
 }
 
-BOOST_AUTO_TEST_CASE(checkVariableParameter) {
+TEST(QuilCompilerTester,checkVariableParameter) {
 
 	const std::string src = R"src(__qpu__ statePrep2x2(qbit qreg, double theta1) {
 RY(theta1) 0
@@ -254,7 +250,7 @@ RY(theta1) 0
 	auto ir = compiler->compile(src);
 	std::cout << "TEST:\n" << ir->getKernels()[0]->toString("qreg") << "\n\n";
 
-	BOOST_VERIFY(ir->getKernels()[0]->nParameters() == 1);
+	EXPECT_TRUE(ir->getKernels()[0]->nParameters() == 1);
 
 	const std::string src2 = R"src(__qpu__ statePrep2x2(qbit qreg, double theta1) {
 RY(theta1) 0
@@ -263,7 +259,7 @@ RY(theta1) 0
 	ir = compiler->compile(src2);
 	std::cout << "TEST:\n" << ir->getKernels()[0]->toString("qreg") << "\n\n";
 
-	BOOST_VERIFY(ir->getKernels()[0]->nParameters() == 1);
+	EXPECT_TRUE(ir->getKernels()[0]->nParameters() == 1);
 	Eigen::VectorXd v(1);
 	v(0) = 2.2;
 	auto evaled = ir->getKernels()[0]->operator()(v);//({2.2});
@@ -271,4 +267,7 @@ RY(theta1) 0
 
 
 }
-
+int main(int argc, char** argv) {
+   ::testing::InitGoogleTest(&argc, argv);
+   return RUN_ALL_TESTS();
+}
