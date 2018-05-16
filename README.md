@@ -12,7 +12,7 @@ $ python -m pip install --user .
 or CMake and Make without Python support
 ```bash
 $ mkdir build && cd build
-$ cmake ..
+$ cmake .. -DXACC_DIR=$HOME/.xacc (or wherever you installed XACC)
 $ make install 
 ```
 or with Python support
