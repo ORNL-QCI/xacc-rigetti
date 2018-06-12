@@ -96,8 +96,12 @@ const std::string RigettiAccelerator::processInput(
 	while (it.hasNext()) {
 		// Get the next node in the tree
 		auto nextInst = it.next();
-		if (nextInst->isEnabled())
+		if (nextInst->isEnabled()) {
 			nextInst->accept(visitor);
+			if (nextInst->name() == "Measure") {
+				currentMeasurementSupports.push_back(nextInst->bits()[0]);
+			}
+		}
 	}
 
 	std::string measuredQubitsString = "[";
@@ -123,7 +127,22 @@ const std::string RigettiAccelerator::processInput(
 						+ "}";
 	}
 
-//	std::cout <<"JSON:\n" << jsonStr << "\n";
+	// Check that the qpu is online
+	if (backend != "QVM") {
+		std::string deviceResponse = handleExceptionRestClientGet(remoteUrl, "/beta/devices", headers);
+		Document d;
+		d.Parse(deviceResponse);
+		bool is_online = d["devices"][backend]["is_online"].GetBool();
+		bool is_retuning = d["devices"][backend]["is_retuning"].GetBool();
+		while(!is_online && !is_retuning) {
+			xacc::info(backend + " is retuning or offline. Please wait");
+			std::this_thread::sleep_for(std::chrono::milliseconds(400));
+			deviceResponse = handleExceptionRestClientGet(remoteUrl, "/beta/devices", headers);
+			d.Parse(deviceResponse);
+			is_online = d["devices"][backend]["is_online"].GetBool();
+			is_retuning = d["devices"][backend]["is_retuning"].GetBool();
+		}
+	}
 	return jsonStr;
 }
 
@@ -131,13 +150,12 @@ std::vector<std::shared_ptr<AcceleratorBuffer>> RigettiAccelerator::processRespo
                 std::shared_ptr<AcceleratorBuffer> buffer,
                 const std::string& response) {
 	Document document;
-//	std::cout << "HELLO WORLD RESPONSE:\n" << response << "\n";
 	document.Parse(response);
 
 	auto jobId = std::string(document["jobId"].GetString());
 
 	std::string getPath = "/beta/job/" + jobId;
-	std::string getResponse = restClient->get(remoteUrl, getPath, headers);
+	std::string getResponse = handleExceptionRestClientGet(remoteUrl, getPath, headers);
 
 	// Loop until the job is complete,
 	// get the JSON response
@@ -150,7 +168,7 @@ std::vector<std::shared_ptr<AcceleratorBuffer>> RigettiAccelerator::processRespo
 		}
 
 		// Execute HTTP Get
-		getResponse = restClient->get(remoteUrl, getPath, headers);
+		getResponse = handleExceptionRestClientGet(remoteUrl, getPath, headers);
 		std::this_thread::sleep_for(std::chrono::milliseconds(100));
 	}
 
@@ -160,12 +178,14 @@ std::vector<std::shared_ptr<AcceleratorBuffer>> RigettiAccelerator::processRespo
 
 	std::map<std::string, int> counts;
 	for (SizeType i = 0; i < results.Size(); i++) {
+		// Here we are mapping rigetti bit strings 
+		// to ibm-like bit strings - msb and nQubits bits
 		std::string bitString = "";
-		for (SizeType j = 0; j < results[i].Size(); ++j) {
-			bitString += std::to_string(results[i][j].GetInt());
-		}
+		for (int i = 0; i < buffer->size(); ++i) bitString += "0";
 
-//		std::reverse(bitString.begin(), bitString.end());
+		for (SizeType j = 0; j < results[i].Size(); ++j) {
+			bitString.replace(buffer->size() - currentMeasurementSupports[j] - 1, 1, std::to_string(results[i][j].GetInt()));
+		}
 
 		if (counts.find(bitString) != counts.end()) {
 			counts[bitString]++;
@@ -178,6 +198,8 @@ std::vector<std::shared_ptr<AcceleratorBuffer>> RigettiAccelerator::processRespo
 		boost::dynamic_bitset<> b(kv.first);
 		buffer->appendMeasurement(b, kv.second);
 	}
+
+	currentMeasurementSupports.clear();
 
 	return std::vector<std::shared_ptr<AcceleratorBuffer>> {buffer};
 }

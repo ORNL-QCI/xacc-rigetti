@@ -166,6 +166,8 @@ public:
 
 private:
 
+	std::vector<int> currentMeasurementSupports;
+
 	/**
 	 * Private utility to search for the Rigetti
 	 * API key in $HOME/.pyquil_config, $PYQUIL_CONFIG,
