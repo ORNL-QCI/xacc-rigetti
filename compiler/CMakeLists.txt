@@ -26,6 +26,7 @@
 #
 # Contributors:
 #   Initial API and implementation - Alex McCaskey
+#   ANTLR Quil-to-XACC compiler - H. Charles Zhao
 #
 #**********************************************************************************/
 
@@ -52,13 +53,6 @@ set_target_properties(${LIBRARY_NAME} PROPERTIES
   US_BUNDLE_NAME ${_bundle_name}
   )
 
-if(BUILD_SHARED_LIBS)
-	#  set_target_properties(${LIBRARY_NAME} PROPERTIES
-	#    CXX_VISIBILITY_PRESET hidden
-	#    VISIBILITY_INLINES_HIDDEN 1
-	#    )
-endif()
-
 # Embed meta-data from a manifest.json file
 usFunctionEmbedResources(TARGET ${LIBRARY_NAME}
   WORKING_DIRECTORY
@@ -66,6 +60,64 @@ usFunctionEmbedResources(TARGET ${LIBRARY_NAME}
   FILES
     manifest.json
   )
+
+
+# ANTLR setup
+
+add_subdirectory(runtime)
+
+set(xacc_ibm_oqasmcompiler-GENERATED_SRC
+        ${CMAKE_CURRENT_SOURCE_DIR}/generated/QuilLexer.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/generated/QuilParser.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/generated/BaseListener.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/generated/QuilListener.cpp
+        )
+
+foreach( src_file ${xacc_rigetti_quilcompiler-GENERATED_SRC} )
+    set_source_files_properties(
+        ${src_file}
+        PROPERTIES
+        GENERATED TRUE
+    )
+endforeach( src_file )
+
+include_directories(
+        ${CMAKE_CURRENT_SOURCE_DIR}/runtime/src
+        ${CMAKE_CURRENT_SOURCE_DIR}/runtime/src/misc
+        ${CMAKE_CURRENT_SOURCE_DIR}/runtime/src/atn
+        ${CMAKE_CURRENT_SOURCE_DIR}/runtime/src/dfa
+        ${CMAKE_CURRENT_SOURCE_DIR}/runtime/src/tree
+        ${CMAKE_CURRENT_SOURCE_DIR}/runtime/src/support
+        ${CMAKE_CURRENT_SOURCE_DIR}/generated
+)
+
+set(xacc_rigetti_quilcompiler_SRC
+        ${CMAKE_CURRENT_SOURCE_DIR}/QuilCompiler.cpp
+        ${xacc_rigetti_quilcompiler-GENERATED_SRC}
+        )
+
+if (NOT CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
+    set (flags_1 "-Wno-overloaded-virtual")
+else()
+    set (flags_1 "-MP /wd4251")
+endif()
+
+foreach( src_file ${xacc_rigetti_quilcompiler_SRC} )
+    set_source_files_properties(
+            ${src_file}
+            PROPERTIES
+            COMPILE_FLAGS "${COMPILE_FLAGS} ${flags_1}"
+    )
+endforeach( src_file)
+
+if (CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
+    target_compile_options(xacc_ibm_oqasmcompiler PRIVATE "/MT$<$<CONFIG:Debug>:d>")
+endif()
+
+target_link_libraries(${LIBRARY_NAME} antlr4_static)
+
+
+# XACC setup
 
 #target_link_libraries(${LIBRARY_NAME} ${Boost_LIBRARIES} ${OPENSSL_LIBRARIES} ${XACC_LIBRARIES})
 target_link_libraries(${LIBRARY_NAME} ${XACC_LIBRARIES})
