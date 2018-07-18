@@ -13,15 +13,16 @@ namespace quil {
 class  QuilLexer : public antlr4::Lexer {
 public:
   enum {
-    DEFGATE = 1, DEFCIRCUIT = 2, MEASURE = 3, LABEL = 4, HALT = 5, JUMP = 6, 
-    JUMPWHEN = 7, JUMPUNLESS = 8, RESET = 9, WAIT = 10, NOP = 11, INCLUDE = 12, 
-    PRAGMA = 13, FALSE = 14, TRUE = 15, NOT = 16, AND = 17, OR = 18, MOVE = 19, 
-    EXCHANGE = 20, PI = 21, I = 22, SIN = 23, COS = 24, SQRT = 25, EXP = 26, 
-    CIS = 27, PLUS = 28, MINUS = 29, TIMES = 30, DIVIDE = 31, POWER = 32, 
-    IDENTIFIER = 33, INT = 34, FLOAT = 35, STRING = 36, PERIOD = 37, COMMA = 38, 
-    LPAREN = 39, RPAREN = 40, LBRACKET = 41, RBRACKET = 42, COLON = 43, 
-    PERCENTAGE = 44, AT = 45, QUOTE = 46, UNDERSCORE = 47, TAB = 48, NEWLINE = 49, 
-    COMMENT = 50, SPACE = 51, INVALID = 52
+    T__0 = 1, T__1 = 2, T__2 = 3, T__3 = 4, T__4 = 5, T__5 = 6, T__6 = 7, 
+    DEFGATE = 8, DEFCIRCUIT = 9, MEASURE = 10, LABEL = 11, HALT = 12, JUMP = 13, 
+    JUMPWHEN = 14, JUMPUNLESS = 15, RESET = 16, WAIT = 17, NOP = 18, INCLUDE = 19, 
+    PRAGMA = 20, FALSE = 21, TRUE = 22, NOT = 23, AND = 24, OR = 25, MOVE = 26, 
+    EXCHANGE = 27, PI = 28, I = 29, SIN = 30, COS = 31, SQRT = 32, EXP = 33, 
+    CIS = 34, PLUS = 35, MINUS = 36, TIMES = 37, DIVIDE = 38, POWER = 39, 
+    IDENTIFIER = 40, INT = 41, FLOAT = 42, STRING = 43, PERIOD = 44, COMMA = 45, 
+    LPAREN = 46, RPAREN = 47, LBRACKET = 48, RBRACKET = 49, COLON = 50, 
+    PERCENTAGE = 51, AT = 52, QUOTE = 53, UNDERSCORE = 54, TAB = 55, NEWLINE = 56, 
+    COMMENT = 57, SPACE = 58, INVALID = 59
   };
 
   QuilLexer(antlr4::CharStream *input);

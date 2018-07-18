@@ -35,7 +35,7 @@ set (PACKAGE_DESCIPTION "Rigetti XACC Quil Compiler Bundle")
 set (LIBRARY_NAME xacc-rigetti-quilcompiler)
 
 file (GLOB_RECURSE HEADERS *.hpp)
-file (GLOB SRC *.cpp)
+file (GLOB SRC *.cpp generated/*.cpp)
 
 # Set up dependencies to resources to track changes
 usFunctionGetResourceSource(TARGET ${LIBRARY_NAME} OUT SRC)
@@ -66,10 +66,10 @@ usFunctionEmbedResources(TARGET ${LIBRARY_NAME}
 
 add_subdirectory(runtime)
 
-set(xacc_ibm_oqasmcompiler-GENERATED_SRC
+set(xacc_rigetti_quilcompiler-GENERATED_SRC
         ${CMAKE_CURRENT_SOURCE_DIR}/generated/QuilLexer.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/generated/QuilParser.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/generated/BaseListener.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/generated/QuilBaseListener.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/generated/QuilListener.cpp
         )
 
@@ -108,10 +108,10 @@ foreach( src_file ${xacc_rigetti_quilcompiler_SRC} )
             PROPERTIES
             COMPILE_FLAGS "${COMPILE_FLAGS} ${flags_1}"
     )
-endforeach( src_file)
+endforeach( src_file )
 
 if (CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
-    target_compile_options(xacc_ibm_oqasmcompiler PRIVATE "/MT$<$<CONFIG:Debug>:d>")
+    target_compile_options(xacc_rigetti_quilcompiler PRIVATE "/MT$<$<CONFIG:Debug>:d>")
 endif()
 
 target_link_libraries(${LIBRARY_NAME} antlr4_static)

@@ -16,6 +16,21 @@ namespace quil {
 class  QuilListener : public antlr4::tree::ParseTreeListener {
 public:
 
+  virtual void enterXaccsrc(QuilParser::XaccsrcContext *ctx) = 0;
+  virtual void exitXaccsrc(QuilParser::XaccsrcContext *ctx) = 0;
+
+  virtual void enterXacckernel(QuilParser::XacckernelContext *ctx) = 0;
+  virtual void exitXacckernel(QuilParser::XacckernelContext *ctx) = 0;
+
+  virtual void enterTypedparam(QuilParser::TypedparamContext *ctx) = 0;
+  virtual void exitTypedparam(QuilParser::TypedparamContext *ctx) = 0;
+
+  virtual void enterType(QuilParser::TypeContext *ctx) = 0;
+  virtual void exitType(QuilParser::TypeContext *ctx) = 0;
+
+  virtual void enterKernelcall(QuilParser::KernelcallContext *ctx) = 0;
+  virtual void exitKernelcall(QuilParser::KernelcallContext *ctx) = 0;
+
   virtual void enterQuil(QuilParser::QuilContext *ctx) = 0;
   virtual void exitQuil(QuilParser::QuilContext *ctx) = 0;
 
@@ -120,6 +135,9 @@ public:
 
   virtual void enterSegmentExp(QuilParser::SegmentExpContext *ctx) = 0;
   virtual void exitSegmentExp(QuilParser::SegmentExpContext *ctx) = 0;
+
+  virtual void enterIdentifierExp(QuilParser::IdentifierExpContext *ctx) = 0;
+  virtual void exitIdentifierExp(QuilParser::IdentifierExpContext *ctx) = 0;
 
   virtual void enterNumberExp(QuilParser::NumberExpContext *ctx) = 0;
   virtual void exitNumberExp(QuilParser::NumberExpContext *ctx) = 0;

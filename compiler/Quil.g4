@@ -1,10 +1,35 @@
 grammar Quil;
 
+/* This part of the grammar is particular to XACC */
+/***********************************************************************/
+xaccsrc
+   : ( xacckernel NEWLINE* )*
+   ;
+
+xacckernel
+   : '__qpu__' kernelname=IDENTIFIER '(' 'AcceleratorBuffer' acceleratorbuffer=IDENTIFIER ( ',' typedparam )* ')' '{' quil '}'
+   ;
+
+typedparam
+   : type IDENTIFIER
+   ;
+
+type
+   : 'int'
+   | 'double'
+   | 'float'
+   ;
+
+kernelcall
+   : kernelname=IDENTIFIER '(' IDENTIFIER? ( ',' IDENTIFIER )* ')'
+   ;
+/***********************************************************************/
+
 ////////////////////
 // PARSER
 ////////////////////
 
-quil                : allInstr? (NEWLINE+ allInstr)* NEWLINE* EOF ;
+quil                : allInstr? (NEWLINE+ allInstr)* NEWLINE* ;
 
 allInstr            : defGate
                     | defCircuit
@@ -108,6 +133,7 @@ expression          : LPAREN expression RPAREN                  #parenthesisExp
                     | segment                                   #segmentExp
                     | number                                    #numberExp
                     | variable                                  #variableExp
+                    | IDENTIFIER                                #identifierExp  // An XACC parameter
                     ;
 
 segment             : LBRACKET INT MINUS INT RBRACKET ;

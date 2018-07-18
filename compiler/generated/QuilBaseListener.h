@@ -18,6 +18,21 @@ namespace quil {
 class  QuilBaseListener : public QuilListener {
 public:
 
+  virtual void enterXaccsrc(QuilParser::XaccsrcContext * /*ctx*/) override { }
+  virtual void exitXaccsrc(QuilParser::XaccsrcContext * /*ctx*/) override { }
+
+  virtual void enterXacckernel(QuilParser::XacckernelContext * /*ctx*/) override { }
+  virtual void exitXacckernel(QuilParser::XacckernelContext * /*ctx*/) override { }
+
+  virtual void enterTypedparam(QuilParser::TypedparamContext * /*ctx*/) override { }
+  virtual void exitTypedparam(QuilParser::TypedparamContext * /*ctx*/) override { }
+
+  virtual void enterType(QuilParser::TypeContext * /*ctx*/) override { }
+  virtual void exitType(QuilParser::TypeContext * /*ctx*/) override { }
+
+  virtual void enterKernelcall(QuilParser::KernelcallContext * /*ctx*/) override { }
+  virtual void exitKernelcall(QuilParser::KernelcallContext * /*ctx*/) override { }
+
   virtual void enterQuil(QuilParser::QuilContext * /*ctx*/) override { }
   virtual void exitQuil(QuilParser::QuilContext * /*ctx*/) override { }
 
@@ -122,6 +137,9 @@ public:
 
   virtual void enterSegmentExp(QuilParser::SegmentExpContext * /*ctx*/) override { }
   virtual void exitSegmentExp(QuilParser::SegmentExpContext * /*ctx*/) override { }
+
+  virtual void enterIdentifierExp(QuilParser::IdentifierExpContext * /*ctx*/) override { }
+  virtual void exitIdentifierExp(QuilParser::IdentifierExpContext * /*ctx*/) override { }
 
   virtual void enterNumberExp(QuilParser::NumberExpContext * /*ctx*/) override { }
   virtual void exitNumberExp(QuilParser::NumberExpContext * /*ctx*/) override { }
