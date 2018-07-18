@@ -35,6 +35,7 @@
 #include <QuilLexer.h>
 #include "XACC.hpp"
 #include "QuilToXACCListener.hpp"
+#include "QuilErrorListener.hpp"
 
 using namespace quil;
 using namespace antlr4;
@@ -56,8 +57,8 @@ namespace xacc {
             QuilLexer lexer(&input);
             CommonTokenStream tokens(&lexer);
             QuilParser parser(&tokens);
-            // parser.removeErrorListeners();
-            // parser.addErrorListener(new QuilErrorListener());
+            parser.removeErrorListeners();
+            parser.addErrorListener(new QuilErrorListener());
 
             auto ir = xacc::getService<IRProvider>("gate")->createIR();
 
