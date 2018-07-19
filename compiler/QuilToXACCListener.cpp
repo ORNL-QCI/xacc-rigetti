@@ -60,7 +60,7 @@ namespace xacc {
 
         InstructionParameter strToParam(const std::string &str) {
             double num = evalMathExpression(str);
-            if (isnan(num)) {
+            if (std::isnan(num)) {
                 return InstructionParameter(str);
             } else {
                 return InstructionParameter(num);
