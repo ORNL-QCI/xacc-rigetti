@@ -32,8 +32,10 @@
 #include "QuilCompiler.hpp"
 #include "QuilVisitor.hpp"
 #include <boost/tokenizer.hpp>
-#include <QuilLexer.h>
+#include "QuilLexer.h"
+#include "QuilParser.h"
 #include "XACC.hpp"
+#include "IRProvider.hpp"
 #include "QuilToXACCListener.hpp"
 #include "QuilErrorListener.hpp"
 

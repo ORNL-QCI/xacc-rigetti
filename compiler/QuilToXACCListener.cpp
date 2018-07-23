@@ -32,7 +32,10 @@
 #include <boost/math/constants/constants.hpp>
 #include "exprtk.hpp"
 #include "QuilToXACCListener.hpp"
+#include "QuilBaseListener.h"
 #include "XACC.hpp"
+#include "IRProvider.hpp"
+#include "IR.hpp"
 
 using namespace quil;
 
@@ -103,7 +106,7 @@ namespace xacc {
             std::shared_ptr<xacc::Instruction> instruction = gateRegistry->createInstruction(gateName, qubits);
             InstructionParameter param;
             for (int i = 0; i < ctx->param().size(); i++) {
-                param = strToParam(ctx->param(i)->getText());
+                param = strToParam(ctx->param(static_cast<size_t>(i))->getText());
                 instruction->setParameter(i, param);
             }
 

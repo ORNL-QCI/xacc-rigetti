@@ -31,9 +31,9 @@
 #ifndef XACC_RIGETTI_QUILTOXACCLISTENER_H
 #define XACC_RIGETTI_QUILTOXACCLISTENER_H
 
-#include <QuilBaseListener.h>
-#include <IR.hpp>
-#include <IRProvider.hpp>
+#include "QuilBaseListener.h"
+#include "IR.hpp"
+#include "IRProvider.hpp"
 
 using namespace quil;
 
