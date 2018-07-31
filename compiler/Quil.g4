@@ -34,6 +34,7 @@ quil                : allInstr? (NEWLINE+ allInstr)* NEWLINE* ;
 allInstr            : defGate
                     | defCircuit
                     | instr
+                    | kernelcall
                     ;
 
 instr               : gate

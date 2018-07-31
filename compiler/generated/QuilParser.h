@@ -195,6 +195,7 @@ public:
     DefGateContext *defGate();
     DefCircuitContext *defCircuit();
     InstrContext *instr();
+    KernelcallContext *kernelcall();
 
     virtual void enterRule(antlr4::tree::ParseTreeListener *listener) override;
     virtual void exitRule(antlr4::tree::ParseTreeListener *listener) override;
