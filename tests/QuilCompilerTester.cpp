@@ -29,7 +29,7 @@
  *
  **********************************************************************************/
 #include <gtest/gtest.h>
-#include "QuilCompiler.hpp"
+#include "XACC.hpp"
 #include "QuilVisitor.hpp"
 #include "CountGatesOfTypeVisitor.hpp"
 
@@ -38,8 +38,6 @@ using namespace xacc;
 using namespace xacc::quantum;
 
 TEST(QuilCompilerTester,checkTeleportQuil) {
-
-	xacc::Initialize();
 
 	const std::string src("__qpu__ teleport (AcceleratorBuffer qreg) {\n"
 			"   # Prepare a bell state\n"
@@ -59,7 +57,7 @@ TEST(QuilCompilerTester,checkTeleportQuil) {
 			"   LABEL @NOZ\n"
 			"}\n");
 
-	auto compiler = std::make_shared<QuilCompiler>();
+	auto compiler = xacc::getService<Compiler>("quil");
 	auto ir = compiler->compile(src);
 
 	auto function = ir->getKernel("teleport");
@@ -106,7 +104,7 @@ Z 2
 LABEL @END4
 MEASURE 2 [2]
 })src";
-	auto compiler = std::make_shared<QuilCompiler>();
+	auto compiler = xacc::getService<Compiler>("quil");
 
 	auto ir = compiler->compile(src);
 
@@ -137,7 +135,7 @@ TEST(QuilCompilerTester,checkRotations) {
 			R"src(__qpu__ rotate(AcceleratorBuffer qreg) {
 RX(3.141592653589793) 0
 })src";
-	auto compiler = std::make_shared<QuilCompiler>();
+	auto compiler = xacc::getService<Compiler>("quil");
 
 	auto ir = compiler->compile(src);
 
@@ -156,7 +154,7 @@ RX(3.141592653589793) 0
 
 
 TEST(QuilCompilerTester,checkTranslateIR) {
-	auto compiler = std::make_shared<QuilCompiler>();
+	auto compiler = xacc::getService<Compiler>("quil");
 
 	auto f = std::make_shared<GateFunction>("foo");
 
@@ -227,7 +225,7 @@ __qpu__ term2(AcceleratorBuffer qreg) {
 MEASURE 0 [0]
 })src";
 
-	auto compiler = std::make_shared<QuilCompiler>();
+	auto compiler = xacc::getService<Compiler>("quil");
 
 	auto ir = compiler->compile(src);
 
@@ -246,7 +244,7 @@ TEST(QuilCompilerTester,checkVariableParameter) {
 RY(theta1) 0
 })src";
 
-	auto compiler = std::make_shared<QuilCompiler>();
+	auto compiler = xacc::getService<Compiler>("quil");
 
 	auto ir = compiler->compile(src);
 	std::cout << "TEST:\n" << ir->getKernels()[0]->toString("qreg") << "\n\n";
@@ -269,6 +267,9 @@ RY(theta1) 0
 
 }
 int main(int argc, char** argv) {
+    xacc::Initialize();
    ::testing::InitGoogleTest(&argc, argv);
-   return RUN_ALL_TESTS();
+   auto ret = RUN_ALL_TESTS();
+   xacc::Finalize();
+   return ret;
 }
