@@ -26,6 +26,7 @@
 #
 # Contributors:
 #   Initial API and implementation - Alex McCaskey
+#   ANTLR Quil-to-XACC compiler - H. Charles Zhao
 #
 #**********************************************************************************/
 
@@ -34,7 +35,9 @@ set (PACKAGE_DESCIPTION "Rigetti XACC Quil Compiler Bundle")
 set (LIBRARY_NAME xacc-rigetti-quilcompiler)
 
 file (GLOB_RECURSE HEADERS *.hpp)
-file (GLOB SRC *.cpp)
+file (GLOB SRC *.cpp generated/*.cpp)
+
+include_directories(generated)
 
 # Set up dependencies to resources to track changes
 usFunctionGetResourceSource(TARGET ${LIBRARY_NAME} OUT SRC)
@@ -51,13 +54,6 @@ set_target_properties(${LIBRARY_NAME} PROPERTIES
   # This is for convenience, used by other CMake functions
   US_BUNDLE_NAME ${_bundle_name}
   )
-
-if(BUILD_SHARED_LIBS)
-	#  set_target_properties(${LIBRARY_NAME} PROPERTIES
-	#    CXX_VISIBILITY_PRESET hidden
-	#    VISIBILITY_INLINES_HIDDEN 1
-	#    )
-endif()
 
 # Embed meta-data from a manifest.json file
 usFunctionEmbedResources(TARGET ${LIBRARY_NAME}

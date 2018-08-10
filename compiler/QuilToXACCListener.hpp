@@ -1,5 +1,5 @@
 /***********************************************************************************
- * Copyright (c) 2017, UT-Battelle
+ * Copyright (c) 2018, UT-Battelle
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -25,71 +25,39 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * Contributors:
- *   Initial API and implementation - Alex McCaskey
+ *   Initial implementation - H. Charles Zhao
  *
  **********************************************************************************/
-#ifndef IMPLS_RIGETTI_QUILCOMPILER_HPP_
-#define IMPLS_RIGETTI_QUILCOMPILER_HPP_
+#ifndef XACC_RIGETTI_QUILTOXACCLISTENER_H
+#define XACC_RIGETTI_QUILTOXACCLISTENER_H
 
+#include "QuilBaseListener.h"
+#include "IR.hpp"
+#include "IRProvider.hpp"
 
-#include "Compiler.hpp"
-#include "Utils.hpp"
-#include <boost/algorithm/string.hpp>
+using namespace quil;
 
 namespace xacc {
+    namespace quantum {
+        class QuilToXACCListener : public QuilBaseListener {
+            std::shared_ptr<IR> ir;
+            std::shared_ptr<IRProvider> gateRegistry;
+            std::map<std::string, std::shared_ptr<Function>> functions;
+            std::shared_ptr<Function> curFunc;
+        public:
+            explicit QuilToXACCListener(std::shared_ptr<IR>);
 
-namespace quantum {
+            void enterXacckernel(QuilParser::XacckernelContext *ctx) override;
 
-/**
- */
-class QuilCompiler: public xacc::Compiler {
+            void exitXacckernel(QuilParser::XacckernelContext *ctx) override;
 
-public:
+            void exitKernelcall(QuilParser::KernelcallContext *ctx) override;
 
-	QuilCompiler();
+            void exitGate(quil::QuilParser::GateContext *ctx) override;
 
-	/**
-	 * Translate Quil to the
-	 * XACC intermediate representation.
-	 *
-	 * @return ir XACC intermediate representation
-	 */
-	virtual std::shared_ptr<xacc::IR> compile(const std::string& src,
-			std::shared_ptr<Accelerator> acc);
-
-	/**
-	 *
-	 * @param src
-	 * @return
-	 */
-	virtual std::shared_ptr<xacc::IR> compile(const std::string& src);
-
-	/**
-	 * This produces a Quil source code representation of the
-	 * given IR Function
-	 *
-	 * @param function The XACC IR Function to translate
-	 * @return src The source code as a string
-	 */
-	virtual const std::string translate(const std::string& bufferVariable,
-			std::shared_ptr<Function> function);
-
-	virtual const std::string name() const {
-		return "quil";
-	}
-
-	virtual const std::string description() const {
-		return "The Quil Compiler compiles kernels written in the Quil intermediate language.";
-	}
-
-	/**
-	 * The destructor
-	 */
-	virtual ~QuilCompiler() {}
-};
-
-}
-
+            void exitMeasure(quil::QuilParser::MeasureContext *ctx) override;
+        };
+    }
 }
 
 #endif
