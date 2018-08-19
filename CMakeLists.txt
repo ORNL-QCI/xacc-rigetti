@@ -2,6 +2,10 @@ cmake_minimum_required(VERSION 3.2 FATAL_ERROR)
 project(xacc-rigetti LANGUAGES CXX)
 
 option(RIGETTI_BUILD_TESTS "Build test programs" OFF)
+if (FROM_SETUP_PY)
+   message(STATUS "Running build from setup.py, linking to static libstdc++")
+   set (CMAKE_SHARED_LINKER_FLAGS "-static-libstdc++" CACHE INTERNAL "" FORCE)
+endif()
 
 set(CMAKE_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_STANDARD 11)

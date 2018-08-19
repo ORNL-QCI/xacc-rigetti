@@ -19,6 +19,7 @@ import shutil
 import sysconfig
 
 env = os.environ.copy()
+_version = open(os.path.join(os.getcwd(), 'VERSION')).read().strip()
 
 class CMakeExtension(Extension):
     def __init__(self, name, sourcedir=''):
@@ -77,7 +78,7 @@ class CMakeBuild(build_ext):
 
 s = setup(
     name='xacc-rigetti',
-    version='0.1.3',
+    version=_version,
     author='Alex McCaskey',
     install_requires=['xacc >= 0.1.2'],
     author_email='xacc-dev@eclipse.org',
