@@ -36,7 +36,7 @@ using namespace antlr4;
 class QuilErrorListener : public BaseErrorListener {
 public:
     void syntaxError(Recognizer *recognizer, Token *offendingSymbol, size_t line, size_t charPositionInLine,
-                     const std::__cxx11::string &msg, std::__exception_ptr::exception_ptr e) override {
+                     const std::string &msg, std::exception_ptr e) override {
         std::ostringstream output;
         output << "Invalid Rigetti source: ";
         output << "line " << line << ":" << charPositionInLine << " " << msg;
