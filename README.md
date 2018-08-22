@@ -1,4 +1,4 @@
-[![Build Status](http://ci.eclipse.org/xacc/buildStatus/icon?job=xacc-rigetti-ci)](http://ci.eclipse.org/xacc/job/xacc-rigetti-ci/)
+[![Build Status](https://travis-ci.org/ORNL-QCI/xacc-rigetti.svg?branch=master)](https://travis-ci.org/ORNL-QCI/xacc-rigetti)
 
 # XACC Plugins for working with Rigetti Forest API
 These plugins for XACC provide a Compiler implementation for Quil and an Accelerator implementation targeting the remote Rigetti QVM/QPU infrastructure
