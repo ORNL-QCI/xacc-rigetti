@@ -13,9 +13,9 @@
  *     names of its contributors may be used to endorse or promote products
  *     derived from this software without specific prior written permission.
  *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ *AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ *IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
  * DISCLAIMED. IN NO EVENT SHALL <COPYRIGHT HOLDER> BE LIABLE FOR ANY
  * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
  * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
@@ -38,26 +38,27 @@
 using namespace quil;
 
 namespace xacc {
-    namespace quantum {
-        class QuilToXACCListener : public QuilBaseListener {
-            std::shared_ptr<IR> ir;
-            std::shared_ptr<IRProvider> gateRegistry;
-            std::map<std::string, std::shared_ptr<Function>> functions;
-            std::shared_ptr<Function> curFunc;
-        public:
-            explicit QuilToXACCListener(std::shared_ptr<IR>);
+namespace quantum {
+class QuilToXACCListener : public QuilBaseListener {
+  std::shared_ptr<IR> ir;
+  std::shared_ptr<IRProvider> gateRegistry;
+  std::map<std::string, std::shared_ptr<Function>> functions;
+  std::shared_ptr<Function> curFunc;
 
-            void enterXacckernel(QuilParser::XacckernelContext *ctx) override;
+public:
+  explicit QuilToXACCListener(std::shared_ptr<IR>);
 
-            void exitXacckernel(QuilParser::XacckernelContext *ctx) override;
+  void enterXacckernel(QuilParser::XacckernelContext *ctx) override;
 
-            void exitKernelcall(QuilParser::KernelcallContext *ctx) override;
+  void exitXacckernel(QuilParser::XacckernelContext *ctx) override;
 
-            void exitGate(quil::QuilParser::GateContext *ctx) override;
+  void exitKernelcall(QuilParser::KernelcallContext *ctx) override;
 
-            void exitMeasure(quil::QuilParser::MeasureContext *ctx) override;
-        };
-    }
-}
+  void exitGate(quil::QuilParser::GateContext *ctx) override;
+
+  void exitMeasure(quil::QuilParser::MeasureContext *ctx) override;
+};
+} // namespace quantum
+} // namespace xacc
 
 #endif

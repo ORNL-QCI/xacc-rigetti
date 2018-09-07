@@ -13,9 +13,9 @@
  *     names of its contributors may be used to endorse or promote products
  *     derived from this software without specific prior written permission.
  *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ *AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ *IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
  * DISCLAIMED. IN NO EVENT SHALL <COPYRIGHT HOLDER> BE LIABLE FOR ANY
  * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
  * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
@@ -59,134 +59,131 @@ namespace quantum {
  */
 class RigettiAccelerator : virtual public RemoteAccelerator {
 public:
+  RigettiAccelerator() : RemoteAccelerator() {}
 
-	RigettiAccelerator() : RemoteAccelerator() {}
+  RigettiAccelerator(std::shared_ptr<Client> client)
+      : RemoteAccelerator(client) {}
+  /**
+   * Create, store, and return an AcceleratorBuffer with the given
+   * variable id string and of the given number of bits.
+   * The string id serves as a unique identifier
+   * for future lookups and reuse of the AcceleratorBuffer.
+   *
+   * @param varId
+   * @param size
+   * @return
+   */
+  std::shared_ptr<AcceleratorBuffer> createBuffer(const std::string &varId,
+                                                  const int size);
 
-	RigettiAccelerator(std::shared_ptr<Client> client) : RemoteAccelerator(client) {}
-	/**
-	 * Create, store, and return an AcceleratorBuffer with the given
-	 * variable id string and of the given number of bits.
-	 * The string id serves as a unique identifier
-	 * for future lookups and reuse of the AcceleratorBuffer.
-	 *
-	 * @param varId
-	 * @param size
-	 * @return
-	 */
-	std::shared_ptr<AcceleratorBuffer> createBuffer(const std::string& varId,
-			const int size);
+  virtual std::shared_ptr<AcceleratorBuffer>
+  createBuffer(const std::string &varId);
 
-	virtual std::shared_ptr<AcceleratorBuffer> createBuffer(
-				const std::string& varId);
+  virtual std::vector<std::shared_ptr<AcceleratorBuffer>>
+  execute(std::shared_ptr<AcceleratorBuffer> buffer,
+          const std::vector<std::shared_ptr<Function>> functions) {
+    int counter = 0;
+    std::vector<std::shared_ptr<AcceleratorBuffer>> tmpBuffers;
+    for (auto f : functions) {
+      xacc::info("Rigetti Executing kernel = " + f->name());
+      auto tmpBuffer = createBuffer(buffer->name() + std::to_string(counter),
+                                    buffer->size());
+      RemoteAccelerator::execute(tmpBuffer, f);
+      tmpBuffers.push_back(tmpBuffer);
+      counter++;
+    }
 
-	virtual std::vector<std::shared_ptr<AcceleratorBuffer>> execute(
-			std::shared_ptr<AcceleratorBuffer> buffer,
-			const std::vector<std::shared_ptr<Function>> functions) {
-		int counter = 0;
-		std::vector<std::shared_ptr<AcceleratorBuffer>> tmpBuffers;
-		for (auto f : functions) {
-			xacc::info("Rigetti Executing kernel = " + f->name());
-			auto tmpBuffer = createBuffer(
-					buffer->name() + std::to_string(counter), buffer->size());
-			RemoteAccelerator::execute(tmpBuffer, f);
-			tmpBuffers.push_back(tmpBuffer);
-			counter++;
-		}
+    return tmpBuffers;
+  }
 
-		return tmpBuffers;
-	}
+  virtual void initialize() {}
 
-	virtual void initialize() {}
+  /**
+   * Return true if this Accelerator can allocated
+   * NBits number of bits.
+   * @param NBits
+   * @return
+   */
+  virtual bool isValidBufferSize(const int NBits);
 
-	/**
-	 * Return true if this Accelerator can allocated
-	 * NBits number of bits.
-	 * @param NBits
-	 * @return
-	 */
-	virtual bool isValidBufferSize(const int NBits);
+  virtual const std::string
+  processInput(std::shared_ptr<AcceleratorBuffer> buffer,
+               std::vector<std::shared_ptr<Function>> functions);
 
-	virtual const std::string processInput(
-			std::shared_ptr<AcceleratorBuffer> buffer,
-			std::vector<std::shared_ptr<Function>> functions);
+  /**
+   * take response and create
+   */
+  virtual std::vector<std::shared_ptr<AcceleratorBuffer>>
+  processResponse(std::shared_ptr<AcceleratorBuffer> buffer,
+                  const std::string &response);
+  /**
+   * This Accelerator models QPU Gate accelerators.
+   * @return
+   */
+  virtual AcceleratorType getType() { return AcceleratorType::qpu_gate; }
 
-	/**
-	 * take response and create
-	 */
-	virtual std::vector<std::shared_ptr<AcceleratorBuffer>> processResponse(
-			std::shared_ptr<AcceleratorBuffer> buffer,
-			const std::string& response);
-	/**
-	 * This Accelerator models QPU Gate accelerators.
-	 * @return
-	 */
-	virtual AcceleratorType getType() {
-		return AcceleratorType::qpu_gate;
-	}
+  /**
+   * We have no need to transform the IR for this Accelerator,
+   * so return an empty list, for now.
+   * @return
+   */
+  virtual std::vector<std::shared_ptr<IRTransformation>>
+  getIRTransformations() {
+    std::vector<std::shared_ptr<IRTransformation>> v;
+    return v;
+  }
 
-	/**
-	 * We have no need to transform the IR for this Accelerator,
-	 * so return an empty list, for now.
-	 * @return
-	 */
-	virtual std::vector<std::shared_ptr<IRTransformation>> getIRTransformations() {
-		std::vector<std::shared_ptr<IRTransformation>> v;
-		return v;
-	}
+  /**
+   * Return all relevant RigettiAccelerator runtime options.
+   * Users can set the api-key, execution type, and number of triels
+   * from the command line with these options.
+   */
+  virtual std::shared_ptr<options_description> getOptions() {
+    auto desc =
+        std::make_shared<options_description>("Rigetti Accelerator Options");
+    desc->add_options()("rigetti-api-key", value<std::string>(),
+                        "Provide the Rigetti Forest API key. This is used if "
+                        "$HOME/.pyquil_config is not found")(
+        "rigetti-trials", value<std::string>(),
+        "Provide the number of trials to execute.")(
+        "rigetti-backend", value<std::string>(),
+        "Optional input, if provided will trigger "
+        "QPU connection with given device name. Otherwise, if not give, "
+        "default to QVM.");
+    return desc;
+  }
 
-	/**
-	 * Return all relevant RigettiAccelerator runtime options.
-	 * Users can set the api-key, execution type, and number of triels
-	 * from the command line with these options.
-	 */
-	virtual std::shared_ptr<options_description> getOptions() {
-		auto desc = std::make_shared<options_description>(
-				"Rigetti Accelerator Options");
-		desc->add_options()("rigetti-api-key", value<std::string>(),
-				"Provide the Rigetti Forest API key. This is used if $HOME/.pyquil_config is not found")
-				("rigetti-trials", value<std::string>(), "Provide the number of trials to execute.")
-				("rigetti-backend", value<std::string>(), "Optional input, if provided will trigger "
-						"QPU connection with given device name. Otherwise, if not give, default to QVM.");
-		return desc;
-	}
+  virtual const std::string name() const { return "rigetti"; }
 
-	virtual const std::string name() const {
-		return "rigetti";
-	}
+  virtual const std::string description() const {
+    return "The Rigetti Accelerator interacts with "
+           "the Forest QVM or QPU to execute XACC quantum IR.";
+  }
 
-	virtual const std::string description() const {
-		return "The Rigetti Accelerator interacts with "
-				"the Forest QVM or QPU to execute XACC quantum IR.";
-	}
-
-	/**
-	 * The destructor
-	 */
-	virtual ~RigettiAccelerator() {}
+  /**
+   * The destructor
+   */
+  virtual ~RigettiAccelerator() {}
 
 private:
+  std::vector<int> currentMeasurementSupports;
 
-	std::vector<int> currentMeasurementSupports;
+  /**
+   * Private utility to search for the Rigetti
+   * API key in $HOME/.pyquil_config, $PYQUIL_CONFIG,
+   * or --api-key command line arg
+   */
+  void searchAPIKey(std::string &key, std::string &id);
 
-	/**
-	 * Private utility to search for the Rigetti
-	 * API key in $HOME/.pyquil_config, $PYQUIL_CONFIG,
-	 * or --api-key command line arg
-	 */
-	void searchAPIKey(std::string& key, std::string& id);
-
-	/**
-	 * Private utility to search for key in the config
-	 * file.
-	 */
-	void findApiKeyInFile(std::string& key, std::string& id, boost::filesystem::path &p);
-
+  /**
+   * Private utility to search for key in the config
+   * file.
+   */
+  void findApiKeyInFile(std::string &key, std::string &id,
+                        boost::filesystem::path &p);
 };
 
-}
-}
-
-
-
+} // namespace quantum
+} // namespace xacc
 
 #endif

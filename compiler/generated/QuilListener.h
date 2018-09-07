@@ -3,19 +3,17 @@
 
 #pragma once
 
-
 #include "antlr4-runtime.h"
 #include "QuilParser.h"
-
 
 namespace quil {
 
 /**
- * This interface defines an abstract listener for a parse tree produced by QuilParser.
+ * This interface defines an abstract listener for a parse tree produced by
+ * QuilParser.
  */
-class  QuilListener : public antlr4::tree::ParseTreeListener {
+class QuilListener : public antlr4::tree::ParseTreeListener {
 public:
-
   virtual void enterXaccsrc(QuilParser::XaccsrcContext *ctx) = 0;
   virtual void exitXaccsrc(QuilParser::XaccsrcContext *ctx) = 0;
 
@@ -118,7 +116,8 @@ public:
   virtual void enterClassicalUnary(QuilParser::ClassicalUnaryContext *ctx) = 0;
   virtual void exitClassicalUnary(QuilParser::ClassicalUnaryContext *ctx) = 0;
 
-  virtual void enterClassicalBinary(QuilParser::ClassicalBinaryContext *ctx) = 0;
+  virtual void
+  enterClassicalBinary(QuilParser::ClassicalBinaryContext *ctx) = 0;
   virtual void exitClassicalBinary(QuilParser::ClassicalBinaryContext *ctx) = 0;
 
   virtual void enterNop(QuilParser::NopContext *ctx) = 0;
@@ -180,8 +179,6 @@ public:
 
   virtual void enterRealN(QuilParser::RealNContext *ctx) = 0;
   virtual void exitRealN(QuilParser::RealNContext *ctx) = 0;
-
-
 };
 
-}  // namespace quil
+} // namespace quil

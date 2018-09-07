@@ -13,9 +13,9 @@
  *     names of its contributors may be used to endorse or promote products
  *     derived from this software without specific prior written permission.
  *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ *AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ *IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
  * DISCLAIMED. IN NO EVENT SHALL <COPYRIGHT HOLDER> BE LIABLE FOR ANY
  * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
  * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
@@ -36,70 +36,68 @@
 using namespace xacc;
 using namespace xacc::quantum;
 
-TEST(QuilVisitorTester,checkIRToQuil) {
+TEST(QuilVisitorTester, checkIRToQuil) {
 
-	auto f = std::make_shared<GateFunction>("foo");
+  auto f = std::make_shared<GateFunction>("foo");
 
-	auto x = std::make_shared<X>(0);
-	auto h = std::make_shared<Hadamard>(1);
-	auto cn1 = std::make_shared<CNOT>(1, 2);
-	auto cn2 = std::make_shared<CNOT>(0, 1);
-	auto h2 = std::make_shared<Hadamard>(0);
-	auto m0 = std::make_shared<Measure>(0, 0);
-	auto m1 = std::make_shared<Measure>(1,1);
+  auto x = std::make_shared<X>(0);
+  auto h = std::make_shared<Hadamard>(1);
+  auto cn1 = std::make_shared<CNOT>(1, 2);
+  auto cn2 = std::make_shared<CNOT>(0, 1);
+  auto h2 = std::make_shared<Hadamard>(0);
+  auto m0 = std::make_shared<Measure>(0, 0);
+  auto m1 = std::make_shared<Measure>(1, 1);
 
-	auto cond1 = std::make_shared<ConditionalFunction>(0);
-	auto z = std::make_shared<Z>(2);
-	cond1->addInstruction(z);
-	auto cond2 = std::make_shared<ConditionalFunction>(1);
-	auto x2 = std::make_shared<X>(2);
-	cond2->addInstruction(x2);
+  auto cond1 = std::make_shared<ConditionalFunction>(0);
+  auto z = std::make_shared<Z>(2);
+  cond1->addInstruction(z);
+  auto cond2 = std::make_shared<ConditionalFunction>(1);
+  auto x2 = std::make_shared<X>(2);
+  cond2->addInstruction(x2);
 
-	f->addInstruction(x);
-	f->addInstruction(h);
-	f->addInstruction(cn1);
-	f->addInstruction(cn2);
-	f->addInstruction(h2);
-	f->addInstruction(m0);
-	f->addInstruction(m1);
-	f->addInstruction(cond1);
-	f->addInstruction(cond2);
+  f->addInstruction(x);
+  f->addInstruction(h);
+  f->addInstruction(cn1);
+  f->addInstruction(cn2);
+  f->addInstruction(h2);
+  f->addInstruction(m0);
+  f->addInstruction(m1);
+  f->addInstruction(cond1);
+  f->addInstruction(cond2);
 
+  // Create the Instruction Visitor that is going
+  // to map our IR to Quil.
+  auto visitor = std::make_shared<QuilVisitor>();
 
-	// Create the Instruction Visitor that is going
-	// to map our IR to Quil.
-	auto visitor = std::make_shared<QuilVisitor>();
+  // Our QIR is really a tree structure
+  // so create a pre-order tree traversal
+  // InstructionIterator to walk it
+  InstructionIterator it(f);
+  while (it.hasNext()) {
+    // Get the next node in the tree
+    auto nextInst = it.next();
+    if (nextInst->isEnabled())
+      nextInst->accept(visitor);
+  }
 
-	// Our QIR is really a tree structure
-	// so create a pre-order tree traversal
-	// InstructionIterator to walk it
-	InstructionIterator it(f);
-	while (it.hasNext()) {
-		// Get the next node in the tree
-		auto nextInst = it.next();
-		if (nextInst->isEnabled())
-			nextInst->accept(visitor);
-	}
+  std::string expectedQuil = "X 0\n"
+                             "H 1\n"
+                             "CNOT 1 2\n"
+                             "CNOT 0 1\n"
+                             "H 0\n"
+                             "MEASURE 0 [0]\n"
+                             "MEASURE 1 [1]\n"
+                             "JUMP-UNLESS @conditional_0 [0]\n"
+                             "Z 2\n"
+                             "LABEL @conditional_0\n"
+                             "JUMP-UNLESS @conditional_1 [1]\n"
+                             "X 2\n"
+                             "LABEL @conditional_1\n";
 
-	std::string expectedQuil =
-			"X 0\n"
-			"H 1\n"
-			"CNOT 1 2\n"
-			"CNOT 0 1\n"
-			"H 0\n"
-			"MEASURE 0 [0]\n"
-			"MEASURE 1 [1]\n"
-			"JUMP-UNLESS @conditional_0 [0]\n"
-			"Z 2\n"
-			"LABEL @conditional_0\n"
-			"JUMP-UNLESS @conditional_1 [1]\n"
-			"X 2\n"
-			"LABEL @conditional_1\n";
-
-	EXPECT_TRUE(expectedQuil == visitor->getQuilString());
+  EXPECT_TRUE(expectedQuil == visitor->getQuilString());
 }
 
-int main(int argc, char** argv) {
-   ::testing::InitGoogleTest(&argc, argv);
-   return RUN_ALL_TESTS();
+int main(int argc, char **argv) {
+  ::testing::InitGoogleTest(&argc, argv);
+  return RUN_ALL_TESTS();
 }
