@@ -1,5 +1,5 @@
 /***********************************************************************************
- * Copyright (c) 2017, UT-Battelle
+ * Copyright (c) 2018, UT-Battelle
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -28,43 +28,52 @@
  *   Initial API and implementation - Alex McCaskey
  *
  **********************************************************************************/
-#include "RigettiAccelerator.hpp"
+#include <memory>
+#include <gtest/gtest.h>
 #include "QCSAccelerator.hpp"
 
-#include "cppmicroservices/BundleActivator.h"
-#include "cppmicroservices/BundleContext.h"
-#include "cppmicroservices/ServiceProperties.h"
+using namespace xacc::quantum;
 
-#include <memory>
-#include <set>
+TEST(ImprovedSamplingDecoratorTester, checkSimple) {
+  int shots = 8192;
+  int nExecs = 4;
 
-using namespace cppmicroservices;
+    auto acc = xacc::getAccelerator("qcs");
+    auto buffer = acc->createBuffer("buffer", 16);
 
-namespace {
+    auto compiler = xacc::getService<xacc::Compiler>("xacc-py");
+    const std::string src = R"src(def f(buffer):
+       Rx(1.57,13)
+       Rx(1.57,14)
+       Rx(1.57,15)
+       Measure(13,0)
+       Measure(14,1)
+       Measure(15,2)
+       )src";
 
-/**
- */
-class US_ABI_LOCAL RigettiAcceleratorActivator : public BundleActivator {
+    auto ir = compiler->compile(src, acc);
+    auto f = ir->getKernel("f");
 
-public:
-  RigettiAcceleratorActivator() {}
+    xacc::setOption("qcs-shots", "10000");
+    xacc::setOption("qcs-backend","Aspen-1-3Q-A");
+    acc->execute(buffer, f);
 
-  /**
-   */
-  void Start(BundleContext context) {
-    auto acc = std::make_shared<xacc::quantum::RigettiAccelerator>();
-    context.RegisterService<xacc::Accelerator>(acc);
-    context.RegisterService<xacc::OptionsProvider>(acc);
-    auto acc2 = std::make_shared<xacc::quantum::QCSAccelerator>();
-    context.RegisterService<xacc::Accelerator>(acc2);
-    context.RegisterService<xacc::OptionsProvider>(acc2);
-  }
+    // int nshots = 0;
+    auto counts = buffer->getMeasurementCounts();
+    buffer->print();
+    std::cout << "\n\n";
+    for (auto &kv : counts) {
+        std::cout << kv.first << ":" << kv.second << "\n";
+    }
 
-  /**
-   */
-  void Stop(BundleContext /*context*/) {}
-};
+    // EXPECT_EQ(nshots, nExecs * shots);
+}
 
-} // namespace
 
-CPPMICROSERVICES_EXPORT_BUNDLE_ACTIVATOR(RigettiAcceleratorActivator)
+int main(int argc, char **argv) {
+    xacc::Initialize();
+  ::testing::InitGoogleTest(&argc, argv);
+  auto ret = RUN_ALL_TESTS();
+  xacc::Finalize();
+  return ret;
+}

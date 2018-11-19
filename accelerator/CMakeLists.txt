@@ -11,9 +11,12 @@ usFunctionGetResourceSource(TARGET ${LIBRARY_NAME} OUT SRC)
 # Generate bundle initialization code
 usFunctionGenerateBundleInit(TARGET ${LIBRARY_NAME} OUT SRC)
 
+include_directories(${XACC_INCLUDE_ROOT}/pybind11/include)
+include_directories(${PYTHON_INCLUDE_DIR})
+
 add_library(${LIBRARY_NAME} SHARED ${SRC})
 
-set(_bundle_name xacc_rigetti_accelerator) 
+set(_bundle_name xacc_rigetti_accelerator)
 
 set_target_properties(${LIBRARY_NAME} PROPERTIES
   # This is required for every bundle
@@ -47,7 +50,7 @@ else()
 endif()
 
 
-install(TARGETS ${LIBRARY_NAME} DESTINATION ${CMAKE_INSTALL_PREFIX}/plugins) 
-   
+install(TARGETS ${LIBRARY_NAME} DESTINATION ${CMAKE_INSTALL_PREFIX}/plugins)
+
 file (GLOB test_files ../tests/RigettiAcceleratorTester.cpp)
 #add_tests("${test_files}" "${CMAKE_CURRENT_SOURCE_DIR}" "${XACC_LIBRARIES};xacc-rigetti-accelerator")
