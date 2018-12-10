@@ -75,7 +75,7 @@ void QuilToXACCListener::enterXacckernel(
   std::vector<InstructionParameter> params;
   for (int i = 0; i < ctx->typedparam().size(); i++) {
     params.push_back(InstructionParameter(
-        ctx->typedparam(static_cast<size_t>(i))->IDENTIFIER()->getText()));
+        ctx->typedparam(i)->IDENTIFIER()->getText()));
   }
   curFunc =
       gateRegistry->createFunction(ctx->kernelname->getText(), {}, params);
@@ -115,7 +115,7 @@ void QuilToXACCListener::exitGate(quil::QuilParser::GateContext *ctx) {
       gateRegistry->createInstruction(gateName, qubits);
   InstructionParameter param;
   for (int i = 0; i < ctx->param().size(); i++) {
-    param = strToParam(ctx->param(static_cast<size_t>(i))->getText());
+    param = strToParam(ctx->param(i)->getText());
     instruction->setParameter(i, param);
   }
 
