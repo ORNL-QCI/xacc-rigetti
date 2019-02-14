@@ -80,7 +80,6 @@ s = setup(
     name='xacc-rigetti',
     version=_version,
     author='Alex McCaskey',
-    install_requires=['xacc >= 0.1.2'],
     author_email='xacc-dev@eclipse.org',
     packages=find_packages('python'),
     package_dir={'':'python'},
