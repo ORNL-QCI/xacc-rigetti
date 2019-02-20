@@ -160,20 +160,7 @@ public:
 
 private:
   std::vector<int> currentMeasurementSupports;
-
-  /**
-   * Private utility to search for the Rigetti
-   * API key in $HOME/.pyquil_config, $PYQUIL_CONFIG,
-   * or --api-key command line arg
-   */
-//   void searchAPIKey(std::string &key, std::string &id);
-
-  /**
-   * Private utility to search for key in the config
-   * file.
-   */
-//   void findApiKeyInFile(std::string &key, std::string &id,
-//                         boost::filesystem::path &p);
+    
 };
 
 } // namespace quantum
