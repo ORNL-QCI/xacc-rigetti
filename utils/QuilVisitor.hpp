@@ -33,7 +33,7 @@
 
 #include <memory>
 #include "AllGateVisitor.hpp"
-
+#include <boost/math/constants/constants.hpp>
 namespace xacc {
 namespace quantum {
 
@@ -51,7 +51,7 @@ protected:
    * this visitor is trying to construct
    */
   std::string quilStr;
-
+  constexpr static double pi = boost::math::constants::pi<double>();
   /**
    * Reference to the classical memory address indices
    * where measurements are recorded.
@@ -74,39 +74,51 @@ public:
    * Visit hadamard gates
    */
   void visit(Hadamard &h) {
-    quilStr += "H " + std::to_string(h.bits()[0]) + "\n";
+    std::string qubit = std::to_string(h.bits()[0]);
+    quilStr += "RZ(pi/2) " + qubit + "\\nRX(pi/2) " + qubit + "\\nRZ(pi/2) " + qubit + "\n";
   }
 
   void visit(Identity &i) {
-    quilStr += "I " + std::to_string(i.bits()[0]) + "\n";
+    std::string qubit = std::to_string(i.bits()[0]);
+    quilStr += "I " + qubit + "\n";
   }
 
   void visit(CZ &cz) {
-    quilStr += "CZ " + std::to_string(cz.bits()[0]) + " " +
-               std::to_string(cz.bits()[1]) + "\n";
+    std::string q1 = std::to_string(cz.bits()[0]);
+    std::string q2 = std::to_string(cz.bits()[1]);
+    quilStr += "CZ " + q1 + " " +
+               q2 + "\n";
   }
 
   /**
    * Visit CNOT gates
    */
   void visit(CNOT &cn) {
-    quilStr += "CNOT " + std::to_string(cn.bits()[0]) + " " +
-               std::to_string(cn.bits()[1]) + "\n";
+    std::string q1 = std::to_string(cn.bits()[0]);
+    std::string q2 = std::to_string(cn.bits()[1]);
+    quilStr += "RZ(-pi/2) " + q2 + "\\nRX(pi/2) " + q2 + "\\nCZ " + q2 + " " + q1 + "\\nRX(-pi/2) " + q2 + "\\nRZ(pi/2) " + q2 + "\\nRZ(pi) "+ q1 + "\n";
   }
   /**
    * Visit X gates
    */
-  void visit(X &x) { quilStr += "X " + std::to_string(x.bits()[0]) + "\n"; }
+  void visit(X &x) {
+      std::string qubit = std::to_string(x.bits()[0]);
+      auto angleStr = std::to_string(pi);
+      quilStr += "RX(pi) " + qubit + "\n"; }
 
   /**
    *
    */
-  void visit(Y &y) { quilStr += "Y " + std::to_string(y.bits()[0]) + "\n"; }
+  void visit(Y &y) { 
+      std::string qubit = std::to_string(y.bits()[0]);
+      quilStr += "RZ(pi) " + qubit + "\\nRX(pi) " + qubit + "\n"; }
 
   /**
    * Visit Z gates
    */
-  void visit(Z &z) { quilStr += "Z " + std::to_string(z.bits()[0]) + "\n"; }
+  void visit(Z &z) {
+      std::string qubit = std::to_string(z.bits()[0]);
+      quilStr += "RZ(pi) " + qubit + "\n"; }
 
   /**
    * Visit Measurement gates
@@ -114,12 +126,13 @@ public:
   void visit(Measure &m) {
     if (includeMeasures) {
       int classicalBitIdx = m.getClassicalBitIndex();
-      quilStr += "MEASURE " + std::to_string(m.bits()[0]) + " [" +
+      quilStr += "MEASURE " + std::to_string(m.bits()[0]) + " ro[" +
                  std::to_string(classicalBitIdx) + "]\n";
       classicalAddresses += std::to_string(classicalBitIdx) + ", ";
       numAddresses++;
       qubitToClassicalBitIndex.insert(
           std::make_pair(m.bits()[0], classicalBitIdx));
+      measuredQubits.push_back(m.bits()[0]);
     } else {
       measuredQubits.push_back(m.bits()[0]);
     }
@@ -141,29 +154,36 @@ public:
   }
 
   void visit(Rx &rx) {
+    std::string qubit = std::to_string(rx.bits()[0]);
     auto angleStr = rx.getParameter(0).toString();
-    quilStr += "RX(" + angleStr + ") " + std::to_string(rx.bits()[0]) + "\n";
+    quilStr += "RX(" + angleStr + ") " + qubit + "\n";
   }
 
   void visit(Ry &ry) {
     auto angleStr = ry.getParameter(0).toString();
-    quilStr += "RY(" + angleStr + ") " + std::to_string(ry.bits()[0]) + "\n";
+    std::string qubit = std::to_string(ry.bits()[0]);
+    quilStr += "RX(pi/2) " + qubit + "\\nRZ(" + angleStr + ") " + qubit + "\\nRX(-pi/2) " + qubit + "\n";
   }
 
   void visit(Rz &rz) {
+    std::string qubit = std::to_string(rz.bits()[0]);
     auto angleStr = rz.getParameter(0).toString();
-    quilStr += "RZ(" + angleStr + ") " + std::to_string(rz.bits()[0]) + "\n";
+    quilStr += "RZ(" + angleStr + ") " + qubit + "\n";
   }
 
   void visit(CPhase &cp) {
+    std::string q1 = std::to_string(cp.bits()[0]);
+    std::string q2 = std::to_string(cp.bits()[1]);
     auto angleStr = cp.getParameter(0).toString();
-    quilStr += "CPHASE(" + angleStr + ") " + std::to_string(cp.bits()[0]) +
-               " " + std::to_string(cp.bits()[1]) + "\n";
+    quilStr += "CPHASE(" + angleStr + ") " + q1 +
+               " " + q2 + "\n";
   }
 
   void visit(Swap &s) {
-    quilStr += "SWAP " + std::to_string(s.bits()[0]) + " " +
-               std::to_string(s.bits()[1]) + "\n";
+    std::string q1 = std::to_string(s.bits()[0]);
+    std::string q2 = std::to_string(s.bits()[1]);
+    quilStr += "SWAP " + q1 + " " +
+               q2 + "\n";
   }
 
  void visit(U& u) {

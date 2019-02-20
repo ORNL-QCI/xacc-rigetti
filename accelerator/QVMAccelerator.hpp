@@ -28,8 +28,8 @@
  *   Initial API and implementation - Alex McCaskey
  *
  **********************************************************************************/
-#ifndef QUANTUM_GATE_ACCELERATORS_RIGETTIACCELERATOR_HPP_
-#define QUANTUM_GATE_ACCELERATORS_RIGETTIACCELERATOR_HPP_
+#ifndef QUANTUM_GATE_ACCELERATORS_QVMACCELERATOR_HPP_
+#define QUANTUM_GATE_ACCELERATORS_QVMACCELERATOR_HPP_
 
 #include "RemoteAccelerator.hpp"
 #include "InstructionIterator.hpp"
@@ -50,18 +50,18 @@ namespace xacc {
 namespace quantum {
 
 /**
- * The RigettiAccelerator is a QPUGate Accelerator that
+ * The QVMAccelerator is a QPUGate Accelerator that
  * provides an execute implementation that maps XACC IR
  * to an equivalent Quil string, and executes it on the
- * Rigetti superconducting quantum chip at api.rigetti.com/qvm
- * through Fire's HTTP Client utilities.
+ * Rigetti QVM at 127.0.0.1:5000/qvm 
+ * 
  *
  */
-class RigettiAccelerator : virtual public RemoteAccelerator {
+class QVMAccelerator : virtual public RemoteAccelerator {
 public:
-  RigettiAccelerator() : RemoteAccelerator() {}
+  QVMAccelerator() : RemoteAccelerator() {}
 
-  RigettiAccelerator(std::shared_ptr<Client> client)
+  QVMAccelerator(std::shared_ptr<Client> client)
       : RemoteAccelerator(client) {}
   /**
    * Create, store, and return an AcceleratorBuffer with the given
@@ -85,7 +85,7 @@ public:
     int counter = 0;
     std::vector<std::shared_ptr<AcceleratorBuffer>> tmpBuffers;
     for (auto f : functions) {
-      xacc::info("Rigetti Executing kernel = " + f->name());
+      xacc::info("QVM Executing kernel = " + f->name());
       auto tmpBuffer = createBuffer(buffer->name() + std::to_string(counter),
                                     buffer->size());
       RemoteAccelerator::execute(tmpBuffer, f);
@@ -134,53 +134,33 @@ public:
   }
 
   /**
-   * Return all relevant RigettiAccelerator runtime options.
+   * Return all relevant QVMAccelerator runtime options.
    * Users can set the api-key, execution type, and number of triels
    * from the command line with these options.
    */
   virtual std::shared_ptr<options_description> getOptions() {
     auto desc =
         std::make_shared<options_description>("Rigetti Accelerator Options");
-    desc->add_options()("rigetti-api-key", value<std::string>(),
-                        "Provide the Rigetti Forest API key. This is used if "
-                        "$HOME/.pyquil_config is not found")(
-        "rigetti-trials", value<std::string>(),
-        "Provide the number of trials to execute.")(
-        "rigetti-backend", value<std::string>(),
-        "Optional input, if provided will trigger "
-        "QPU connection with given device name. Otherwise, if not give, "
-        "default to QVM.");
+    desc->add_options()("rigetti-shots", value<std::string>(),
+        "Provide the number of shots to execute on the QVM.");
     return desc;
   }
 
-  virtual const std::string name() const { return "rigetti"; }
+  virtual const std::string name() const { return "rigetti-qvm"; }
 
   virtual const std::string description() const {
-    return "The Rigetti Accelerator interacts with "
-           "the Forest QVM or QPU to execute XACC quantum IR.";
+    return "The Rigetti QVM Accelerator interacts with "
+           "the Forest QVM to execute XACC quantum IR.";
   }
 
   /**
    * The destructor
    */
-  virtual ~RigettiAccelerator() {}
+  virtual ~QVMAccelerator() {}
 
 private:
   std::vector<int> currentMeasurementSupports;
-
-  /**
-   * Private utility to search for the Rigetti
-   * API key in $HOME/.pyquil_config, $PYQUIL_CONFIG,
-   * or --api-key command line arg
-   */
-  void searchAPIKey(std::string &key, std::string &id);
-
-  /**
-   * Private utility to search for key in the config
-   * file.
-   */
-  void findApiKeyInFile(std::string &key, std::string &id,
-                        boost::filesystem::path &p);
+    
 };
 
 } // namespace quantum
