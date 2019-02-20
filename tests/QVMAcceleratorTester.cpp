@@ -30,13 +30,13 @@
  **********************************************************************************/
 #include <memory>
 #include <gtest/gtest.h>
-#include "RigettiAccelerator.hpp"
+#include "QVMAccelerator.hpp"
 #include "JsonVisitor.hpp"
 #include "IRProvider.hpp"
 
 using namespace xacc::quantum;
 
-TEST(RigettiAcceleratorTester, buildQFT) {
+TEST(QVMAcceleratorTester, buildQFT) {
 
   xacc::Initialize();
   auto gateRegistry = xacc::getService<IRProvider>("gate");

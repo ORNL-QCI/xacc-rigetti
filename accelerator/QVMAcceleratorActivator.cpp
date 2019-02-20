@@ -28,7 +28,7 @@
  *   Initial API and implementation - Alex McCaskey
  *
  **********************************************************************************/
-#include "RigettiAccelerator.hpp"
+#include "QVMAccelerator.hpp"
 
 #include "cppmicroservices/BundleActivator.h"
 #include "cppmicroservices/BundleContext.h"
@@ -43,15 +43,15 @@ namespace {
 
 /**
  */
-class US_ABI_LOCAL RigettiAcceleratorActivator : public BundleActivator {
+class US_ABI_LOCAL QVMAcceleratorActivator : public BundleActivator {
 
 public:
-  RigettiAcceleratorActivator() {}
+  QVMAcceleratorActivator() {}
 
   /**
    */
   void Start(BundleContext context) {
-    auto acc = std::make_shared<xacc::quantum::RigettiAccelerator>();
+    auto acc = std::make_shared<xacc::quantum::QVMAccelerator>();
     context.RegisterService<xacc::Accelerator>(acc);
     context.RegisterService<xacc::OptionsProvider>(acc);
   }
@@ -63,4 +63,4 @@ public:
 
 } // namespace
 
-CPPMICROSERVICES_EXPORT_BUNDLE_ACTIVATOR(RigettiAcceleratorActivator)
+CPPMICROSERVICES_EXPORT_BUNDLE_ACTIVATOR(QVMAcceleratorActivator)

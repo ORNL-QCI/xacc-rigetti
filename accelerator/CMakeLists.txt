@@ -1,7 +1,7 @@
 
-set (PACKAGE_NAME "Rigetti XACC Accelerator")
-set (PACKAGE_DESCIPTION "Rigetti XACC Accelerator Framework")
-set (LIBRARY_NAME xacc-rigetti-accelerator)
+set (PACKAGE_NAME "QVM XACC Accelerator")
+set (PACKAGE_DESCIPTION "QVM XACC Accelerator Framework")
+set (LIBRARY_NAME xacc-qvm-accelerator)
 
 file (GLOB_RECURSE HEADERS *.hpp)
 file (GLOB SRC *.cpp)
@@ -13,7 +13,7 @@ usFunctionGenerateBundleInit(TARGET ${LIBRARY_NAME} OUT SRC)
 
 add_library(${LIBRARY_NAME} SHARED ${SRC})
 
-set(_bundle_name xacc_rigetti_accelerator) 
+set(_bundle_name xacc_qvm_accelerator) 
 
 set_target_properties(${LIBRARY_NAME} PROPERTIES
   # This is required for every bundle
@@ -49,5 +49,5 @@ endif()
 
 install(TARGETS ${LIBRARY_NAME} DESTINATION ${CMAKE_INSTALL_PREFIX}/plugins) 
    
-file (GLOB test_files ../tests/RigettiAcceleratorTester.cpp)
-#add_tests("${test_files}" "${CMAKE_CURRENT_SOURCE_DIR}" "${XACC_LIBRARIES};xacc-rigetti-accelerator")
+file (GLOB test_files ../tests/QVMAcceleratorTester.cpp)
+#add_tests("${test_files}" "${CMAKE_CURRENT_SOURCE_DIR}" "${XACC_LIBRARIES};xacc-qvm-accelerator")

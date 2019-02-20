@@ -30,6 +30,7 @@
 *.exe
 *.out
 *.app
+.ipynb_*
 /build/
 /.cproject
 /.project

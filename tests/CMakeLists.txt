@@ -1,4 +1,4 @@
-add_xacc_test(RigettiAccelerator)
+add_xacc_test(QVMAccelerator)
 if(${XACC_HAS_ANTLR})
     include_directories(${CMAKE_SOURCE_DIR}/compiler)
     add_xacc_test(QuilCompiler)
