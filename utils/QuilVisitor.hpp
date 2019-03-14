@@ -178,7 +178,7 @@ public:
 
     quilStr += s.str();
   }
-  
+
   void visit(GateFunction &f) { return; }
   /**
    * Return the quil string

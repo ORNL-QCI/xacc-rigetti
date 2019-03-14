@@ -73,6 +73,7 @@ void QCSAccelerator::execute(
   auto shots = xacc::optionExists("qcs-shots") ? std::stoi(xacc::getOption("qcs-shots")) : 1000;
 
   std::map<int,int> bitToQubit;
+  std::vector<int> tobesorted;
   InstructionIterator it(function);
   while (it.hasNext()) {
     // Get the next node in the tree
@@ -80,9 +81,16 @@ void QCSAccelerator::execute(
     if (nextInst->isEnabled()) {
       nextInst->accept(visitor);
       if (nextInst->name() == "Measure") {
-        bitToQubit.insert({boost::get<int>(nextInst->getParameter(0)), nextInst->bits()[0]});
+        // bitToQubit.insert({boost::get<int>(nextInst->getParameter(0)), nextInst->bits()[0]});
+        tobesorted.push_back(nextInst->bits()[0]);
       }
     }
+  }
+
+  std::sort(tobesorted.begin(),tobesorted.end());
+  bitToQubit.clear();
+  for (int i = 0; i < tobesorted.size(); i++) {
+      bitToQubit[i] = tobesorted[i];
   }
 
   // Create our usual old Quil string, but
@@ -91,7 +99,7 @@ void QCSAccelerator::execute(
   int nMeasures = count.countGates();
   auto quilStr = visitor->getQuilString();
   boost::replace_all(quilStr, "[", "ro[");
-  quilStr = "DECLARE ro BIT[" + std::to_string(nMeasures) + "]\n" + quilStr;
+  quilStr = "DECLARE ro BIT[" + std::to_string(buffer->size()) + "]\n" + quilStr;
 
   std::shared_ptr<py::scoped_interpreter> guard;
   if (!xacc::isPyApi) {
@@ -108,6 +116,7 @@ void QCSAccelerator::execute(
   auto qc = get_qc(backend);
 
   auto compiled = qc.attr("compile")(program);
+
   py::array_t<int> results = qc.attr("run")(compiled);
 
 //   py::print(results);
@@ -122,6 +131,7 @@ void QCSAccelerator::execute(
           s << *results.data(i,j);
           bitString[buffer->size()-1-qbit] = s.str()[0];
        }
+    //    py::print("adding " + bitString);
        buffer->appendMeasurement(bitString);
    }
 

@@ -39,23 +39,23 @@ TEST(ImprovedSamplingDecoratorTester, checkSimple) {
   int nExecs = 4;
 
     auto acc = xacc::getAccelerator("qcs");
-    auto buffer = acc->createBuffer("buffer", 16);
+    auto buffer = acc->createBuffer("buffer", 17);
 
     auto compiler = xacc::getService<xacc::Compiler>("xacc-py");
     const std::string src = R"src(def f(buffer):
-       Rx(1.57,13)
+       Rx(1.57,1)
        Rx(1.57,14)
        Rx(1.57,15)
-       Measure(13,0)
-       Measure(14,1)
-       Measure(15,2)
+       Measure(0, 1)
+       Measure(1, 14)
+       Measure(2, 15)
        )src";
 
     auto ir = compiler->compile(src, acc);
     auto f = ir->getKernel("f");
 
     xacc::setOption("qcs-shots", "10000");
-    xacc::setOption("qcs-backend","Aspen-1-3Q-A");
+    xacc::setOption("qcs-backend","Aspen-1-4Q-G");
     acc->execute(buffer, f);
 
     // int nshots = 0;
