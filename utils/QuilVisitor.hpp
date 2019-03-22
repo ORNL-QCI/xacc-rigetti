@@ -142,17 +142,23 @@ public:
 
   void visit(Rx &rx) {
     auto angleStr = rx.getParameter(0).toString();
-    quilStr += "RX(" + angleStr + ") " + std::to_string(rx.bits()[0]) + "\n";
+    std::stringstream ss;
+    ss << std::fixed << std::setprecision(2) << angleStr;
+    quilStr += "RX(" + ss.str() + ") " + std::to_string(rx.bits()[0]) + "\n";
   }
 
   void visit(Ry &ry) {
     auto angleStr = ry.getParameter(0).toString();
-    quilStr += "RY(" + angleStr + ") " + std::to_string(ry.bits()[0]) + "\n";
+    std::stringstream ss;
+    ss << std::fixed << std::setprecision(2) << angleStr;
+    quilStr += "RY(" + ss.str() + ") " + std::to_string(ry.bits()[0]) + "\n";
   }
 
   void visit(Rz &rz) {
     auto angleStr = rz.getParameter(0).toString();
-    quilStr += "RZ(" + angleStr + ") " + std::to_string(rz.bits()[0]) + "\n";
+    std::stringstream ss;
+    ss << std::fixed << std::setprecision(2) << angleStr;
+    quilStr += "RZ(" + ss.str() + ") " + std::to_string(rz.bits()[0]) + "\n";
   }
 
   void visit(CPhase &cp) {

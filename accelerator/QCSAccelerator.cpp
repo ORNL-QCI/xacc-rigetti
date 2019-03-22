@@ -118,20 +118,25 @@ void QCSAccelerator::execute(
   auto compiled = qc.attr("compile")(program);
 
   py::array_t<int> results = qc.attr("run")(compiled);
-
+  auto shape = results.request().shape;
+//   py::print(shape[0]);
+//   py::print(shape[1]);
 //   py::print(results);
   std::string zeroString = "";
   for (int i = 0; i < buffer->size(); i++) zeroString += "0";
 
    for (int i = 0; i < shots; i++) {
        std::string bitString = zeroString;
-       for (int j = 0; j < nMeasures; j++) {
-          auto qbit = bitToQubit[j];
-          std::stringstream s;
+       std::stringstream s;
+
+       for (int j = 0; j < buffer->size(); j++) {
+        //   auto qbit = bitToQubit[j];
           s << *results.data(i,j);
-          bitString[buffer->size()-1-qbit] = s.str()[0];
+        //   bitString[buffer->size()-1-qbit] = s.str()[0];
        }
-    //    py::print("adding " + bitString);
+       bitString = s.str();
+       std::reverse(bitString.begin(), bitString.end());
+    //    if (i<4) py::print("adding " + bitString);
        buffer->appendMeasurement(bitString);
    }
 
@@ -143,17 +148,20 @@ std::vector<std::shared_ptr<AcceleratorBuffer>> QCSAccelerator::execute(
     const std::vector<std::shared_ptr<Function>> functions) {
 
     std::vector<std::shared_ptr<AcceleratorBuffer>> tmpBuffers;
+    int counter = 1;
     for (auto f : functions) {
       auto tmpBuffer = createBuffer(f->name(),
                                     buffer->size());
 
       high_resolution_clock::time_point t1 = high_resolution_clock::now();
+      xacc::info("Execution " + std::to_string(counter) + ": " + f->name());
       execute(tmpBuffer, f);
       high_resolution_clock::time_point t2 = high_resolution_clock::now();
 
       auto duration = duration_cast<microseconds>( t2 - t1 ).count();
       tmpBuffer->addExtraInfo("exec-time", ExtraInfo(duration*1e-6));
       tmpBuffers.push_back(tmpBuffer);
+      counter++;
     }
 
     return tmpBuffers;
