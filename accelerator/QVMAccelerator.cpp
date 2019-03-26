@@ -111,7 +111,7 @@ const std::string QVMAccelerator::processInput(
       measuredQubitsString.substr(0, measuredQubitsString.length() - 1) + "]";
 
   auto quilStr = visitor->getQuilString();
-  boost::replace_all(quilStr, "\n", "\\n");
+  quilStr = std::regex_replace(quilStr, std::regex("\n"),"\\n");
 
   // Create the Json String
   jsonStr += "{\"type\": \"" + type + "\", " + "\"addresses\": {\"ro\": " + measuredQubitsString + "}, \"trials\": " + trials + ", \"compiled-quil\": \"" + declareStr + "\\n" + quilStr + "\"}";
@@ -144,7 +144,6 @@ QVMAccelerator::processResponse(std::shared_ptr<AcceleratorBuffer> buffer,
   }
 
   for (auto &kv : counts) {
-    // boost::dynamic_bitset<> b(kv.first);
     buffer->appendMeasurement(kv.first, kv.second);
   }
 

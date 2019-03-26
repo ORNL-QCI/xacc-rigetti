@@ -35,8 +35,6 @@
 #include "InstructionIterator.hpp"
 #include "QuilVisitor.hpp"
 #include "XACC.hpp"
-#include <boost/algorithm/string.hpp>
-#include <boost/filesystem.hpp>
 
 #define RAPIDJSON_HAS_STDSTRING 1
 
