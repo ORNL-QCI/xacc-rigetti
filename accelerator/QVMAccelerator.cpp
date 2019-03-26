@@ -102,20 +102,20 @@ const std::string QVMAccelerator::processInput(
       }
     }
   }
-  
+
   std::string measuredQubitsString = "[";
   for (auto m : visitor->getMeasuredQubits()) {
     measuredQubitsString += std::to_string(m) + ",";
   }
   measuredQubitsString =
       measuredQubitsString.substr(0, measuredQubitsString.length() - 1) + "]";
-    
+
   auto quilStr = visitor->getQuilString();
   boost::replace_all(quilStr, "\n", "\\n");
 
   // Create the Json String
   jsonStr += "{\"type\": \"" + type + "\", " + "\"addresses\": {\"ro\": " + measuredQubitsString + "}, \"trials\": " + trials + ", \"compiled-quil\": \"" + declareStr + "\\n" + quilStr + "\"}";
-    
+
   return jsonStr;
 }
 
@@ -123,11 +123,11 @@ std::vector<std::shared_ptr<AcceleratorBuffer>>
 QVMAccelerator::processResponse(std::shared_ptr<AcceleratorBuffer> buffer,
                                     const std::string &response) {
 //   xacc::info(response);
-    
+
   Document document;;
   document.Parse(response);
   const Value &results = document["ro"];
-    
+
   std::map<std::string, int> counts;
   for (SizeType i = 0; i < results.Size(); i++){
     std::string bitString = "";
@@ -144,8 +144,8 @@ QVMAccelerator::processResponse(std::shared_ptr<AcceleratorBuffer> buffer,
   }
 
   for (auto &kv : counts) {
-    boost::dynamic_bitset<> b(kv.first);
-    buffer->appendMeasurement(b, kv.second);
+    // boost::dynamic_bitset<> b(kv.first);
+    buffer->appendMeasurement(kv.first, kv.second);
   }
 
   currentMeasurementSupports.clear();

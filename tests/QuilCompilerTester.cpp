@@ -261,8 +261,7 @@ RY(theta1) 0
   std::cout << "TEST:\n" << ir->getKernels()[0]->toString("qreg") << "\n\n";
 
   EXPECT_TRUE(ir->getKernels()[0]->nParameters() == 1);
-  Eigen::VectorXd v(1);
-  v(0) = 2.2;
+  std::vector<double> v{2.2};
   auto evaled = ir->getKernels()[0]->operator()(v); //({2.2});
   std::cout << "TEST:\n" << evaled->toString("qreg") << "\n\n";
 }

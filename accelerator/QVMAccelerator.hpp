@@ -53,8 +53,8 @@ namespace quantum {
  * The QVMAccelerator is a QPUGate Accelerator that
  * provides an execute implementation that maps XACC IR
  * to an equivalent Quil string, and executes it on the
- * Rigetti QVM at 127.0.0.1:5000/qvm 
- * 
+ * Rigetti QVM at 127.0.0.1:5000/qvm
+ *
  *
  */
 class QVMAccelerator : virtual public RemoteAccelerator {
@@ -138,11 +138,9 @@ public:
    * Users can set the api-key, execution type, and number of triels
    * from the command line with these options.
    */
-  virtual std::shared_ptr<options_description> getOptions() {
-    auto desc =
-        std::make_shared<options_description>("Rigetti Accelerator Options");
-    desc->add_options()("rigetti-shots", value<std::string>(),
-        "Provide the number of shots to execute on the QVM.");
+  virtual OptionPairs getOptions() {
+    OptionPairs desc {{"rigetti-shots",
+        "Provide the number of shots to execute on the QVM."}};
     return desc;
   }
 
@@ -160,7 +158,7 @@ public:
 
 private:
   std::vector<int> currentMeasurementSupports;
-    
+
 };
 
 } // namespace quantum
