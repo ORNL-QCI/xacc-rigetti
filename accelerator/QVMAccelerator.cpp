@@ -29,10 +29,14 @@
  *
  **********************************************************************************/
 #include "QVMAccelerator.hpp"
-#include <boost/filesystem.hpp>
 #include <algorithm>
 #include <typeinfo>
 
+#define RAPIDJSON_HAS_STDSTRING 1
+
+#include "rapidjson/prettywriter.h"
+#include "rapidjson/document.h"
+using namespace rapidjson;
 namespace xacc {
 namespace quantum {
 

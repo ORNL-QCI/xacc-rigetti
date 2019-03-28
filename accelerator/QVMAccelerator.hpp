@@ -36,12 +36,6 @@
 #include "QuilVisitor.hpp"
 #include "XACC.hpp"
 
-#define RAPIDJSON_HAS_STDSTRING 1
-
-#include "rapidjson/prettywriter.h"
-#include "rapidjson/document.h"
-using namespace rapidjson;
-
 using namespace xacc;
 
 namespace xacc {
