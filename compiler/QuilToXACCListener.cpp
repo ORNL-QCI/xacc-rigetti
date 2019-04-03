@@ -36,6 +36,7 @@
 #include "XACC.hpp"
 #include "IRProvider.hpp"
 #include "IR.hpp"
+#include "xacc_service.hpp"
 
 using namespace quil;
 

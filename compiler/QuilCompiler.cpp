@@ -38,6 +38,7 @@
 #include "IRProvider.hpp"
 #include "QuilToXACCListener.hpp"
 #include "QuilErrorListener.hpp"
+#include "xacc_service.hpp"
 
 using namespace quil;
 using namespace antlr4;

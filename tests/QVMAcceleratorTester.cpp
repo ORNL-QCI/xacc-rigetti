@@ -33,6 +33,7 @@
 #include "QVMAccelerator.hpp"
 #include "JsonVisitor.hpp"
 #include "IRProvider.hpp"
+#include "xacc_service.hpp"
 
 using namespace xacc::quantum;
 
