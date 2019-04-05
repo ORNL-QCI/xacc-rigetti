@@ -33,7 +33,6 @@
 
 #include "Compiler.hpp"
 #include "Utils.hpp"
-#include <boost/algorithm/string.hpp>
 
 namespace xacc {
 

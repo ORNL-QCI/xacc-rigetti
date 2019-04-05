@@ -31,6 +31,7 @@
 #include "QVMAccelerator.hpp"
 #include <algorithm>
 #include <typeinfo>
+#include <regex>
 
 #define RAPIDJSON_HAS_STDSTRING 1
 

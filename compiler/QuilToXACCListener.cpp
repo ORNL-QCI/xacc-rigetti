@@ -29,7 +29,6 @@
  *
  **********************************************************************************/
 
-#include <boost/math/constants/constants.hpp>
 #include "exprtk.hpp"
 #include "QuilToXACCListener.hpp"
 #include "QuilBaseListener.h"
@@ -46,7 +45,7 @@ using parser_t = exprtk::parser<double>;
 
 namespace xacc {
 namespace quantum {
-constexpr static double pi = boost::math::constants::pi<double>();
+constexpr static double pi = 3.1415926;
 
 QuilToXACCListener::QuilToXACCListener(std::shared_ptr<xacc::IR> ir) : ir(ir) {
   gateRegistry = xacc::getService<IRProvider>("gate");

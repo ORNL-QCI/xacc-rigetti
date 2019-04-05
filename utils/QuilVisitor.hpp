@@ -33,7 +33,7 @@
 
 #include <memory>
 #include "AllGateVisitor.hpp"
-#include <boost/math/constants/constants.hpp>
+
 namespace xacc {
 namespace quantum {
 
@@ -51,7 +51,7 @@ protected:
    * this visitor is trying to construct
    */
   std::string quilStr;
-  constexpr static double pi = boost::math::constants::pi<double>();
+  constexpr static double pi = 3.1415926;
   /**
    * Reference to the classical memory address indices
    * where measurements are recorded.
@@ -109,7 +109,7 @@ public:
   /**
    *
    */
-  void visit(Y &y) { 
+  void visit(Y &y) {
       std::string qubit = std::to_string(y.bits()[0]);
       quilStr += "RZ(pi) " + qubit + "\\nRX(pi) " + qubit + "\n"; }
 
@@ -198,7 +198,7 @@ public:
 
     quilStr += s.str();
   }
-  
+
   void visit(GateFunction &f) { return; }
   /**
    * Return the quil string

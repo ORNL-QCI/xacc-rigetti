@@ -31,7 +31,6 @@
  **********************************************************************************/
 #include "QuilCompiler.hpp"
 #include "QuilVisitor.hpp"
-#include <boost/tokenizer.hpp>
 #include "QuilLexer.h"
 #include "QuilParser.h"
 #include "XACC.hpp"
